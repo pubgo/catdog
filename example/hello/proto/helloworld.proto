@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+
+import "proto/api.proto";
+
+package helloworld;
+
+service Helloworld {
+	rpc Call(Request) returns (Response) {}
+}
+
+message Request {
+	string name = 1;
+	helloworld.TestReq req = 2;
+}
+
+message Response {
+	string msg = 1;
+}

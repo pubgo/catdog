@@ -1,0 +1,11 @@
+### example测试
+POST http://localhost:8080/v1/example/version
+Content-Type: application/json
+
+{
+  "input": "hello"
+}
+
+### health
+POST http://localhost:8080/health
+Content-Type: application/json
