@@ -4,8 +4,8 @@ import (
 	"github.com/pubgo/catdog/catdog_abc"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
+	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/catdog/catdog_server"
 	"github.com/pubgo/catdog/version"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
@@ -62,7 +62,7 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 
 			if pg.Handler() != nil {
 				hdlr := pg.Handler()
-				xerror.Panic(catdog_server.RegHandler(hdlr.Register, hdlr.Handler, hdlr.Opts...))
+				xerror.Panic(catdog_handler.Register(hdlr.Register, hdlr.Handler, hdlr.Opts...))
 			}
 		}
 
@@ -73,7 +73,7 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 			for _, pl := range plugins {
 				if pl.Handler() != nil {
 					hdlr := pl.Handler()
-					xerror.Panic(catdog_server.RegHandler(hdlr.Register, hdlr.Handler, hdlr.Opts...))
+					xerror.Panic(catdog_handler.Register(hdlr.Register, hdlr.Handler, hdlr.Opts...))
 				}
 			}
 			return xerror.Wrap(dix.Dix(defaultCatDog))
@@ -84,6 +84,5 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 		rootCmd.AddCommand(cmd.Parent())
 	}
 
-	xerror.Panic(rootCmd.Execute())
-	return nil
+	return xerror.Wrap(rootCmd.Execute())
 }

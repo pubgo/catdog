@@ -40,7 +40,7 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 	return nil
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	p := &Plugin{
 		name: "recovery",
 	}

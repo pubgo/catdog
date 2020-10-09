@@ -15,16 +15,16 @@ import (
 
 const defaultContentType = "application/json"
 
-type catdogServer struct {
+type wrapper struct {
 	server.Server
 	handlers []func(g fiber.Router) error
 }
 
-func (r *catdogServer) Handlers() []func(g fiber.Router) error {
+func (r *wrapper) Handlers() []func(g fiber.Router) error {
 	return r.handlers
 }
 
-func (r *catdogServer) httpHandler(httpMethod, relativePath string, handlers ...fiber.Handler) {
+func (r *wrapper) httpHandler(httpMethod, relativePath string, handlers ...fiber.Handler) {
 	r.handlers = append(r.handlers, func(router fiber.Router) error {
 		if router == nil {
 			return xerror.New("please init router group")
@@ -34,7 +34,7 @@ func (r *catdogServer) httpHandler(httpMethod, relativePath string, handlers ...
 	})
 }
 
-func (r *catdogServer) Handle(handler server.Handler) (err error) {
+func (r *wrapper) Handle(handler server.Handler) (err error) {
 	defer xerror.RespErr(&err)
 	xerror.Panic(r.Server.Handle(handler))
 
@@ -102,38 +102,5 @@ func (r *catdogServer) Handle(handler server.Handler) (err error) {
 		})
 	}
 
-	return
-}
-
-func RegHandler(register interface{}, hdlr interface{}, opts ...server.HandlerOption) (err error) {
-	defer xerror.RespErr(&err)
-
-	if register == nil || hdlr == nil {
-		return xerror.New("params should not be nil")
-	}
-
-	vRegister := reflect.ValueOf(register)
-	vHandler := reflect.ValueOf(hdlr)
-
-	if vRegister.Kind() != reflect.Func ||
-		vRegister.Type().NumIn() < 2 ||
-		vRegister.Type().In(0).String() != "server.Server" {
-		return xerror.New("the first parameter should be <func(s server.Server, hdlr handler, opts ...server.HandlerOption) error> type")
-	}
-
-	if !vHandler.Type().Implements(vRegister.Type().In(1)) {
-		return xerror.Fmt("the second parameter type does not match")
-	}
-
-	var sOpts = []reflect.Value{
-		reflect.ValueOf(Default),
-		vHandler,
-	}
-	for _, opt := range opts {
-		sOpts = append(sOpts, reflect.ValueOf(opt))
-	}
-	if ret := vRegister.Call(sOpts); !ret[0].IsNil() {
-		return xerror.WrapF(ret[0].Interface().(error), "%v, %v", vHandler.Type(), vRegister.Type())
-	}
 	return
 }

@@ -4,15 +4,21 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/pubgo/dix"
+	"github.com/pubgo/xerror"
+
 	"github.com/micro/go-micro/v3/logger"
 	"github.com/pubgo/xlog"
 )
 
 func init() {
-	logger.DefaultLogger = NewMicroLogger(GetDevLog())
+	logger.DefaultLogger = newMicroLogger(GetDevLog())
+	xerror.Exit(dix.Dix(func(logs xlog.XLog) {
+		logger.DefaultLogger = newMicroLogger(GetDevLog())
+	}))
 }
 
-func NewMicroLogger(xl xlog.XLog) logger.Logger {
+func newMicroLogger(xl xlog.XLog) logger.Logger {
 	return &microLogger{log: xl.Named("micro", xlog.AddCallerSkip(2))}
 }
 

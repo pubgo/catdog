@@ -3,21 +3,20 @@ package entry
 import (
 	"github.com/pubgo/catdog"
 	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_log"
 	"github.com/pubgo/catdog/example/hello/handler"
 	helloworld "github.com/pubgo/catdog/example/hello/proto"
 	"github.com/pubgo/catdog/version"
-	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 )
 
-var log = catdog_log.GetDevLog().Named("hello")
+var log xlog.XLog
 
 func init() {
-	xerror.Exit(dix.Dix(func(plugin xlog.XLog) {
-		log = plugin.Named("hello")
-	}))
+	xerror.Exit(catdog_log.Watch("entry", &log))
+	catdog_config.Project = "hello"
 }
 
 func GetEntry() catdog.Entry {

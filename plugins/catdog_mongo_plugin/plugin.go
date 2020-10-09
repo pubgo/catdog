@@ -1,42 +1,38 @@
 package catdog_mongo_plugin
 
 import (
-	"github.com/pubgo/catdog/catdog_abc"
-	"github.com/pubgo/catdog/catdog_log"
+	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/dix"
-	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
 var _ catdog_plugin.Plugin = (*Plugin)(nil)
 
 type Plugin struct {
-	catdog_plugin.Plugin
+	name string
 	log xlog.XLog
 }
 
-func (p *Plugin) GetClient(name string) {
-
+func (p *Plugin) Commands() *cobra.Command {
+	return nil
 }
 
-func (p *Plugin) Init(cat catdog_abc.CatDog) (rErr error) {
-	defer xerror.RespErr(&rErr)
+func (p *Plugin) Handler() *catdog_handler.Handler {
+	return nil
+}
 
-	cat.Init()
-
-	return xerror.Wrap(dix.Dix(p))
+func (p *Plugin) String() string {
+	return p.name
 }
 
 func (p *Plugin) Flags() *pflag.FlagSet {
-	flags := p.Plugin.Flags()
-	return flags
+	return nil
 }
 
 func NewPlugin() *Plugin {
 	return &Plugin{
-		Plugin: catdog_plugin.New("mongo"),
-		log:    catdog_log.GetLog().Named("catdog.plugin.mongo"),
+		name: "mongo",
 	}
 }

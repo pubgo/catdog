@@ -2,13 +2,13 @@ package catdog_entry
 
 import (
 	"fmt"
+	"github.com/pubgo/catdog/catdog_handler"
 	"strings"
 
 	"github.com/gofiber/fiber"
 	"github.com/micro/go-micro/v3/server"
 	"github.com/pubgo/catdog/catdog_abc"
 	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/catdog/catdog_server"
 	"github.com/pubgo/xerror"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -71,7 +71,7 @@ func (b *baseEntry) Commands(commands ...*cobra.Command) error {
 
 // func(s server.Server, handle TestHandler, opts ...server.HandlerOption) error
 func (b *baseEntry) Handler(register interface{}, hdlr interface{}, opts ...server.HandlerOption) error {
-	return xerror.Wrap(catdog_server.RegHandler(register, hdlr, opts...))
+	return xerror.Wrap(catdog_handler.Register(register, hdlr, opts...))
 }
 
 func (b *baseEntry) Plugins(pgs ...catdog_plugin.Plugin) (err error) {

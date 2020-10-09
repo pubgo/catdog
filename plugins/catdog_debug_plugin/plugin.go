@@ -31,7 +31,7 @@ func (p *Plugin) String() string {
 }
 
 func (p *Plugin) Handler() *catdog_handler.Handler {
-	return catdog_handler.Register(
+	return catdog_handler.New(
 		debug.RegisterDebugHandler,
 		handler.NewHandler(),
 		//api.WithEndpoint(&api.Endpoint{
@@ -48,7 +48,7 @@ func (p *Plugin) Init(cat catdog_abc.CatDog) error {
 	return xerror.Wrap(dix.Dix(p))
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	return &Plugin{
 		name: "catdog_debug_plugin",
 	}

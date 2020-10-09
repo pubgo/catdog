@@ -91,7 +91,7 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 	return flags
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	return &Plugin{
 		name:    "pidfile",
 		pidPath: filepath.Join(catdog_config.CfgDir, "pidfile"),

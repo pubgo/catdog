@@ -4,7 +4,7 @@ import (
 	"github.com/micro/go-micro/v3/registry"
 )
 
-type catdogRegistry struct {
+type wrapper struct {
 	registry.Registry
 }
 

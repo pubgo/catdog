@@ -1,8 +1,6 @@
-package catdog_rpc_entry
+package catdog_entry
 
 import (
-	"github.com/pubgo/catdog/catdog_log"
-	"github.com/pubgo/xlog"
 	"net/http"
 	"sync"
 
@@ -12,24 +10,15 @@ import (
 	"github.com/micro/go-micro/v3/server"
 	"github.com/pubgo/catdog/catdog_abc"
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_server"
 	"github.com/pubgo/xerror"
 	"github.com/spf13/pflag"
 )
 
-var _ catdog_entry.Entry = (*rpcEntry)(nil)
-
-const Name = "entry.rpc"
-
-var log xlog.XLog
-
-func init() {
-	xerror.Exit(catdog_log.Watch(Name, &log))
-}
+var _ Entry = (*rpcEntry)(nil)
 
 type rpcEntry struct {
-	catdog_entry.Entry
+	Entry
 
 	mux      sync.Mutex
 	app      *fiber.App
@@ -107,7 +96,7 @@ func (r *rpcEntry) initCatDog(cat catdog_abc.CatDog) (err error) {
 
 func newEntry() *rpcEntry {
 	ent := &rpcEntry{
-		Entry:    catdog_entry.NewBase(),
+		Entry:    NewBase(),
 		app:      fiber.New(),
 		addr:     ":8080",
 		gwPrefix: "",
@@ -118,6 +107,6 @@ func newEntry() *rpcEntry {
 	return ent
 }
 
-func New() catdog_entry.Entry {
+func New() Entry {
 	return newEntry()
 }

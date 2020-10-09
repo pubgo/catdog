@@ -93,7 +93,7 @@ func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (err error) {
 	//))
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	p := &Plugin{
 		name: "config",
 		cfg:  catdog_config.GetCfg(),

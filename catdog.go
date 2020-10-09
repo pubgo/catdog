@@ -1,34 +1,40 @@
 package catdog
 
 import (
-	"github.com/micro/go-micro/v3/client"
-	"github.com/micro/go-micro/v3/model"
-	"github.com/micro/go-micro/v3/server"
-	"github.com/pubgo/catdog/plugins/catdog_debug_plugin"
-	"github.com/pubgo/catdog/plugins/catdog_pidfile_plugin"
-	"github.com/pubgo/catdog/plugins/catdog_recovery_plugin"
-	"github.com/pubgo/catdog/plugins/catdog_version_plugin"
-	"github.com/pubgo/xlog"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/pubgo/xerror"
+	"github.com/pubgo/xlog"
 
+	"github.com/micro/go-micro/v3/client"
+	"github.com/micro/go-micro/v3/model"
+	"github.com/micro/go-micro/v3/server"
 	signalutil "github.com/micro/go-micro/v3/util/signal"
 
 	"github.com/pubgo/catdog/catdog_abc"
-
+	"github.com/pubgo/catdog/catdog_log"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/catdog/plugins/catdog_broker_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_client_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_config_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_debug_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_log_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_model_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_pidfile_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_recovery_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_registry_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_server_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_version_plugin"
 )
+
+var log xlog.XLog
+
+func init() {
+	xerror.Exit(catdog_log.Watch("catdog", &log))
+}
 
 type catDog struct {
 	opts catdog_abc.Options
@@ -43,17 +49,18 @@ func (t *catDog) loadDefaultPlugin() {
 	var register = func(plugin catdog_plugin.Plugin) {
 		xerror.Panic(catdog_plugin.Register(plugin, catdog_plugin.Module(_globalPlugin)))
 	}
-	register(catdog_config_plugin.NewPlugin())
-	register(catdog_log_plugin.NewPlugin())
-	register(catdog_model_plugin.NewPlugin())
-	register(catdog_registry_plugin.NewPlugin())
-	register(catdog_broker_plugin.NewPlugin())
-	register(catdog_server_plugin.NewPlugin())
-	register(catdog_client_plugin.NewPlugin())
-	register(catdog_version_plugin.NewPlugin())
-	register(catdog_pidfile_plugin.NewPlugin())
-	register(catdog_debug_plugin.NewPlugin())
-	register(catdog_recovery_plugin.NewPlugin())
+
+	register(catdog_config_plugin.New())
+	register(catdog_log_plugin.New())
+	register(catdog_model_plugin.New())
+	register(catdog_registry_plugin.New())
+	register(catdog_broker_plugin.New())
+	register(catdog_server_plugin.New())
+	register(catdog_client_plugin.New())
+	register(catdog_version_plugin.New())
+	register(catdog_pidfile_plugin.New())
+	register(catdog_debug_plugin.New())
+	register(catdog_recovery_plugin.New())
 }
 
 func (t *catDog) Init(opts ...catdog_abc.Option) {
@@ -86,14 +93,14 @@ func (t *catDog) Start() (err error) {
 	defer xerror.RespErr(&err)
 
 	for _, fn := range t.opts.BeforeStart {
-		xlog.DebugF("BeforeStart: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
+		log.DebugF("BeforeStart: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
 		xerror.Panic(fn())
 	}
 
 	xerror.Panic(t.Server().Start())
 
 	for _, fn := range t.opts.AfterStart {
-		xlog.DebugF("AfterStart: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
+		log.DebugF("AfterStart: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
 		xerror.Panic(fn())
 	}
 
@@ -105,7 +112,7 @@ func (t *catDog) Stop() (err error) {
 
 	var errs []error
 	for _, fn := range t.opts.BeforeStop {
-		xlog.DebugF("BeforeStop: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
+		log.DebugF("BeforeStop: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
 		if err := fn(); err != nil {
 			errs = append(errs, xerror.Wrap(err))
 		}
@@ -116,7 +123,7 @@ func (t *catDog) Stop() (err error) {
 	}
 
 	for _, fn := range t.opts.AfterStop {
-		xlog.DebugF("AfterStop: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
+		log.DebugF("AfterStop: %s", xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
 		if err := fn(); err != nil {
 			errs = append(errs, xerror.Wrap(err))
 		}

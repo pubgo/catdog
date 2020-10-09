@@ -37,7 +37,7 @@ func (p *Plugin) Init(cat catdog_abc.CatDog) error {
 	return nil
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	return &Plugin{
 		name: "broker",
 		opts: catdog_broker.Default.Options(),

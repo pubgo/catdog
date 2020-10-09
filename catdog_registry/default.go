@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	Default = &catdogRegistry{Registry: mdns.NewRegistry()}
+	Default = &wrapper{Registry: mdns.NewRegistry()}
 )

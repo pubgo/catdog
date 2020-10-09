@@ -44,7 +44,7 @@ func (p Plugin) Commands() *cobra.Command {
 	}
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	return &Plugin{
 		name: "catdog_version",
 	}

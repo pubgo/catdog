@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	Default = &catdogModel{Model: mud.NewModel()}
+	Default = &wrapper{Model: mud.NewModel()}
 )

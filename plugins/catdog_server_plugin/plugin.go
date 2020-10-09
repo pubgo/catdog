@@ -43,7 +43,7 @@ func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (err error) {
 	return xerror.Wrap(dix.Dix(p))
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	p := &Plugin{
 		Options: catdog_server.Default.Options(),
 	}

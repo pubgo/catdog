@@ -6,4 +6,4 @@ import (
 	"github.com/micro/go-micro/v3/server/grpc"
 )
 
-var Default = &catdogServer{Server: grpc.NewServer(server.Context(context.Background()))}
+var Default = &wrapper{Server: grpc.NewServer(server.Context(context.Background()))}

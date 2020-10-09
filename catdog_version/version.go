@@ -17,7 +17,7 @@ func Register(name string, data M) {
 func Get(name string) (v M) {
 	m, ok := versions.Load(name)
 	if ok {
-		xerror.Exit(mergo.Map(&v, m))
+		xerror.Panic(mergo.Map(&v, m))
 		return
 	}
 	return

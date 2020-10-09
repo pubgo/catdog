@@ -1,20 +1,22 @@
 package catdog_abc
 
 import (
+	"os"
+
+	"github.com/pubgo/dix"
+	"github.com/pubgo/xerror"
+
 	"github.com/micro/go-micro/v3/broker"
+	"github.com/micro/go-micro/v3/client"
+	"github.com/micro/go-micro/v3/model"
 	"github.com/micro/go-micro/v3/registry"
+	"github.com/micro/go-micro/v3/server"
+
 	"github.com/pubgo/catdog/catdog_broker"
 	"github.com/pubgo/catdog/catdog_client"
 	"github.com/pubgo/catdog/catdog_model"
 	"github.com/pubgo/catdog/catdog_registry"
 	"github.com/pubgo/catdog/catdog_server"
-	"github.com/pubgo/dix"
-	"github.com/pubgo/xerror"
-	"os"
-
-	"github.com/micro/go-micro/v3/client"
-	"github.com/micro/go-micro/v3/model"
-	"github.com/micro/go-micro/v3/server"
 )
 
 // CatDog is an interface for a micro catdog_service

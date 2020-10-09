@@ -1,11 +1,9 @@
 package catdog_log_plugin
 
 import (
-	"github.com/micro/go-micro/v3/logger"
 	"github.com/pubgo/catdog/catdog_abc"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_handler"
-	"github.com/pubgo/catdog/catdog_log"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
@@ -42,7 +40,6 @@ func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (rErr error) {
 	zapL := xerror.PanicErr(xlog_config.NewZapLoggerFromConfig(p.config)).(*zap.Logger)
 	log := xlog.New(zapL.WithOptions(xlog.AddCaller(), xlog.AddCallerSkip(1)))
 	p.log = log.Named(catdog_config.Project)
-	logger.DefaultLogger = catdog_log.NewMicroLogger(p.log)
 
 	xerror.Panic(xlog.SetLog(log.Named(catdog_config.Project, xlog.AddCallerSkip(1))))
 	return xerror.Wrap(dix.Dix(p.log))
@@ -54,7 +51,7 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 	return flags
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	p := &Plugin{
 		name:   "log",
 		config: xlog_config.NewDevConfig(),

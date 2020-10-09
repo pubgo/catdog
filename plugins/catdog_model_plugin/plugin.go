@@ -40,7 +40,7 @@ func (p *Plugin) Init(cat catdog_abc.CatDog) error {
 	return xerror.Wrap(dix.Dix(p))
 }
 
-func NewPlugin() *Plugin {
+func New() *Plugin {
 	return &Plugin{
 		name: "model",
 	}
