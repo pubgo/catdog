@@ -18,9 +18,9 @@ func GetDevLog() xlog.XLog {
 	return xlog.New(zl)
 }
 
-func Watch(name string, log *xlog.XLog) error {
-	*log = GetDevLog().Named(name)
+func Watch(fn func(logs xlog.XLog)) error {
+	fn(GetDevLog())
 	return xerror.Wrap(dix.Dix(func(logs xlog.XLog) {
-		*log = logs.Named(name)
+		fn(logs)
 	}))
 }

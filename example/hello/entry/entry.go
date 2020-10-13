@@ -15,13 +15,17 @@ import (
 var log xlog.XLog
 
 func init() {
-	xerror.Exit(catdog_log.Watch("entry", &log))
-	catdog_config.Project = "hello"
+	xerror.Exit(catdog_log.Watch(func(logs xlog.XLog) {
+		log = logs.Named("hello")
+	}))
 }
 
 func GetEntry() catdog.Entry {
+	catdog_config.Domain = "dev"
+	catdog_config.Project = "hello"
+
 	ent := catdog.NewEntry()
-	xerror.Exit(ent.Name("hello", "hello 服务"))
+	xerror.Exit(ent.Name(catdog_config.Project, "hello 服务"))
 	xerror.Exit(ent.Version(version.Version))
 	ent.Init(catdog_abc.BeforeStart(func() error {
 		log.Info("init Hello")

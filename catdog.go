@@ -33,7 +33,9 @@ import (
 var log xlog.XLog
 
 func init() {
-	xerror.Exit(catdog_log.Watch("catdog", &log))
+	xerror.Exit(catdog_log.Watch(func(logs xlog.XLog) {
+		log = logs.Named("catdog")
+	}))
 }
 
 type catDog struct {

@@ -3,6 +3,7 @@ package catdog_entry
 import (
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
@@ -70,8 +71,13 @@ func (r *rpcEntry) startService() error {
 
 func (r *rpcEntry) middleware() []interface{} {
 	return []interface{}{
-		middleware.Logger("${method} - ${path}\n"),
+		middleware.Recover(),
+		middleware.Logger(middleware.LoggerConfig{
+			Format:     "#${pid} - ${time} ${status} - ${latency} ${method} ${path}\n",
+			TimeFormat: time.RFC3339,
+		}),
 	}
+
 }
 
 func (r *rpcEntry) initCatDog(cat catdog_abc.CatDog) (err error) {
@@ -99,7 +105,7 @@ func newEntry() *rpcEntry {
 		Entry:    NewBase(),
 		app:      fiber.New(),
 		addr:     ":8080",
-		gwPrefix: "",
+		gwPrefix: "gw",
 	}
 	ent.app.Use(ent.middleware()...)
 	xerror.Exit(ent.initFlags())

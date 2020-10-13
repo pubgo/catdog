@@ -73,7 +73,7 @@ func (r *wrapper) Handle(handler server.Handler) (err error) {
 			defer xerror.Resp(func(err xerror.XErr) {
 				_ = view.
 					Status(http.StatusInternalServerError).
-					JSON(err.Stack(true))
+					JSON(err)
 			})
 			xerror.Panic(view.Error())
 

@@ -8,6 +8,10 @@ services:
   user:
     version: "v0.0.2"
 plugins:
+  config:
+    watcher:
+      address:
+        - "127.0.0.1:2379"
   etcd:
     default:
       - "127.0.0.1:2379"

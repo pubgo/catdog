@@ -2,19 +2,16 @@ package catdog_log
 
 import (
 	"fmt"
-	"sync"
-
-	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
+	"sync"
 
 	"github.com/micro/go-micro/v3/logger"
 	"github.com/pubgo/xlog"
 )
 
 func init() {
-	logger.DefaultLogger = newMicroLogger(GetDevLog())
-	xerror.Exit(dix.Dix(func(logs xlog.XLog) {
-		logger.DefaultLogger = newMicroLogger(GetDevLog())
+	xerror.Exit(Watch(func(logs xlog.XLog) {
+		logger.DefaultLogger = newMicroLogger(logs)
 	}))
 }
 

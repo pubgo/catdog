@@ -1,32 +1,39 @@
 package catdog_config_plugin
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/micro/go-micro/v3/config"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/micro/go-micro/v3/config/encoder/yaml"
 	"github.com/micro/go-micro/v3/config/source"
 	"github.com/pubgo/catdog/catdog_abc"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
+	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"os"
-	"path/filepath"
-	"strings"
 
 	mFile "github.com/micro/go-micro/v3/config/source/file"
 )
 
 var _ catdog_plugin.Plugin = (*Plugin)(nil)
 
+type config struct {
+	Address  []string `json:"address"`
+	Username string   `json:"username"`
+	Password string   `json:"password"`
+	Timeout  int32    `json:"timeout"`
+}
+
 type Plugin struct {
 	name string
 	ss   []source.Source
-	cfg  config.Config
+	cfg  *catdog_config.Config
 }
 
 func (p *Plugin) Commands() *cobra.Command {
@@ -39,10 +46,6 @@ func (p *Plugin) Handler() *catdog_handler.Handler {
 
 func (p *Plugin) String() string {
 	return p.name
-}
-
-func (p *Plugin) GetCfg() config.Config {
-	return p.cfg
 }
 
 func (p *Plugin) Flags() *pflag.FlagSet {
@@ -59,17 +62,20 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (err error) {
 	defer xerror.RespErr(&err)
 
-	xerror.Panic(catdog_config.CheckRunMode())
-
 	cat.Init(catdog_abc.AfterStart(func() error {
 		if catdog_config.Trace {
-			fmt.Println("plugins", dix.Graph())
-			fmt.Println("config", string(xerror.PanicBytes(json.MarshalIndent(catdog_config.GetCfg().Map(), "", "  "))))
+			fmt.Println("deps", dix.Graph())
+			fmt.Println("config", catdog_util.MarshalIndent(catdog_config.GetCfg().Map()))
 			fmt.Println("plugins", catdog_plugin.String())
 		}
 		return nil
+	}), catdog_abc.BeforeStart(func() error {
+		return xerror.Wrap(catdog_config.WatchStart())
+	}), catdog_abc.AfterStop(func() error {
+		return xerror.Wrap(catdog_config.WatchStop())
 	}))
 
+	// 加载本地配置文件
 	xerror.Exit(p.cfg.Load(
 		mFile.NewSource(
 			mFile.WithPath(filepath.Join(catdog_config.CfgDir, "config", "config.yaml")),
@@ -77,20 +83,18 @@ func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (err error) {
 		),
 	))
 
-	return xerror.Wrap(catdog_config.WatchStart())
-
+	//var cfg config
+	//xerror.Exit(p.cfg.Get("plugins", "config", "watcher").Scan(&cfg))
+	//
 	//xerror.Exit(p.cfg.Load(
-	//	mFile.NewSource(
-	//		mFile.WithPath("path"),
-	//		mFile.WithPath("/i/do/not/exists.json"),
-	//		source.WithEncoder(yaml.NewEncoder()),
-	//	),
 	//	mEtcd.NewSource(
-	//		mEtcd.WithAddress("10.0.0.10:8500"),
-	//		mEtcd.WithPrefix("/my/prefix"),
+	//		mEtcd.WithAddress(cfg.Address...),
+	//		mEtcd.WithPrefix(strings.Join(catdog_config.ProjectPrefix(), "/")),
 	//		mEtcd.StripPrefix(true),
 	//	),
 	//))
+
+	return nil
 }
 
 func New() *Plugin {

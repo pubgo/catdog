@@ -11,5 +11,7 @@ const Name = "entry"
 var log xlog.XLog
 
 func init() {
-	xerror.Exit(catdog_log.Watch(Name, &log))
+	xerror.Exit(catdog_log.Watch(func(logs xlog.XLog) {
+		log = logs.Named(Name)
+	}))
 }

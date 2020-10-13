@@ -77,3 +77,7 @@ func PathExist(path string) bool {
 	}
 	return true
 }
+
+func MarshalIndent(v interface{}) string {
+	return string(xerror.PanicBytes(json.MarshalIndent(v, "", "  ")))
+}

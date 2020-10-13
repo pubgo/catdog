@@ -9,5 +9,7 @@ import (
 var log xlog.XLog
 
 func init() {
-	xerror.Exit(catdog_log.Watch("hello.handler", &log))
+	xerror.Exit(catdog_log.Watch(func(logs xlog.XLog) {
+		log = logs.Named("hello.handler")
+	}))
 }

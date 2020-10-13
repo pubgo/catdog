@@ -1,31 +1,16 @@
 package catdog_config
 
 import (
+	"context"
 	"github.com/micro/go-micro/v3/config"
 	"github.com/micro/go-micro/v3/config/reader"
 	"github.com/pubgo/dix"
+	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
+	"github.com/pubgo/xprocess"
 	"os"
 	"strings"
-	"time"
-
-	"github.com/pubgo/xerror"
 )
-
-// RunMode 项目运行模式
-var RunMode = struct {
-	Dev     string
-	Test    string
-	Stag    string
-	Prod    string
-	Release string
-}{
-	Dev:     "dev",
-	Test:    "test",
-	Stag:    "stag",
-	Prod:    "prod",
-	Release: "release",
-}
 
 func Env(env *string, names ...string) {
 	getEnv(env, names...)
@@ -62,55 +47,61 @@ func getEnv(val *string, names ...string) {
 	}
 }
 
-func CheckRunMode() error {
-	// 运行环境检查
-	switch Mode {
-	case RunMode.Dev, RunMode.Stag, RunMode.Prod, RunMode.Test, RunMode.Release:
-	default:
-		return xerror.Fmt("running mode does not match, mode: %s", Mode)
-	}
-	return nil
-}
-
-func PluginWrap(names ...string) []string {
+func PluginPrefix(names ...string) []string {
 	return append([]string{Domain, Project, "plugins"}, names...)
 }
 
-type watchCtx struct {
-	time.Time
+func ProjectPrefix() []string {
+	return []string{Domain, Project}
 }
 
 func WatchStart() error {
-	return xerror.Wrap(dix.Dix(&watchCtx{time.Now()}))
+	return xerror.Wrap(dix.Start())
+}
+
+func WatchStop() error {
+	return xerror.Wrap(dix.Stop())
 }
 
 func Watch(name string, watcher func(r reader.Value) error) {
-	xerror.Exit(dix.Dix(func(ctx *watchCtx) {
-		nameWrap := strings.Join(PluginWrap(name), "/")
-
+	xerror.Exit(dix.Dix(func(ctx *dix.StartCtx) {
+		if name == "" {
+			return
+		}
 		if watcher == nil {
 			return
 		}
 
-		cfg := GetCfg()
-		xlog.DebugF("Start Config Watch, Key: %s", nameWrap)
-		w := xerror.PanicErr(cfg.Watch(nameWrap)).(config.Watcher)
+		wKey := strings.Join(PluginPrefix(name), "/")
+		xlog.DebugF("Start Config Watch, Key: %s", wKey)
+		w := xerror.PanicErr(cfg.Watch(wKey)).(config.Watcher)
 
-		go func() {
-			defer xerror.RespGoroutine("plugin_" + name)
+		// 开启监听配置变化
+		cancel := xprocess.Go(func(ctx context.Context) (err error) {
+			defer xerror.RespErr(&err)
 			defer func() {
-				xlog.DebugF("Stop Config Watch, Key: %s", nameWrap)
+				xlog.DebugF("Stop Config Watch, Key: %s", wKey)
 				xerror.Panic(w.Stop())
 			}()
 
 			for {
-				r, err := w.Next()
-				if err != nil && strings.Contains(err.Error(), "stopped") {
-					return
+				select {
+				case <-ctx.Done():
+					return nil
+				default:
+					r, err := w.Next()
+					if err != nil && strings.Contains(err.Error(), "stopped") {
+						return nil
+					}
+					xerror.Panic(err)
+					xerror.Panic(watcher(r))
 				}
-				xerror.Panic(err)
-				xerror.Panic(watcher(r))
 			}
-		}()
+		})
+
+		// 关闭监听配置变化
+		xerror.Exit(dix.Dix(func(stopCtx *dix.StopCtx) error {
+			return xerror.Wrap(cancel())
+		}))
 	}))
 }

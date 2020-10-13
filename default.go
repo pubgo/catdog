@@ -76,7 +76,10 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 					xerror.Panic(catdog_handler.Register(hdlr.Register, hdlr.Handler, hdlr.Opts...))
 				}
 			}
-			return xerror.Wrap(dix.Dix(defaultCatDog))
+
+			xerror.Panic(dix.Dix(defaultCatDog))
+			
+			return nil
 		}
 		cmd.RunE = func(cmd *cobra.Command, args []string) error {
 			return xerror.Wrap(defaultCatDog.Run())

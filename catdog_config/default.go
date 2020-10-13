@@ -19,8 +19,23 @@ var (
 	Mode    = "dev"
 	CfgDir  = xerror.PanicStr(filepath.Abs(filepath.Dir("")))
 	CfgPath = filepath.Join(CfgDir, "config", "config.yaml")
-	cfg     config.Config
+	cfg     *Config
 )
+
+// RunMode 项目运行模式
+var RunMode = struct {
+	Dev     string
+	Test    string
+	Stag    string
+	Prod    string
+	Release string
+}{
+	Dev:     "dev",
+	Test:    "test",
+	Stag:    "stag",
+	Prod:    "prod",
+	Release: "release",
+}
 
 func init() {
 	// 从环境变量中获取系统默认值
@@ -35,12 +50,16 @@ func init() {
 	getSysEnv(&Project, "project_name", "service_name", "server_name")
 
 	// 加载env source
-	cfg = xerror.ExitErr(config.NewConfig()).(config.Config)
+	cfg = &Config{Config: xerror.ExitErr(config.NewConfig()).(config.Config)}
 	xerror.Exit(cfg.Load(
 		mEnv.NewSource(mEnv.WithStrippedPrefix(Domain)),
 	))
 }
 
-func GetCfg() config.Config {
+type Config struct {
+	config.Config
+}
+
+func GetCfg() *Config {
 	return cfg
 }

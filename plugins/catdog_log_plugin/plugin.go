@@ -39,9 +39,9 @@ func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (rErr error) {
 
 	zapL := xerror.PanicErr(xlog_config.NewZapLoggerFromConfig(p.config)).(*zap.Logger)
 	log := xlog.New(zapL.WithOptions(xlog.AddCaller(), xlog.AddCallerSkip(1)))
-	p.log = log.Named(catdog_config.Project)
+	p.log = log.Named(catdog_config.Domain)
 
-	xerror.Panic(xlog.SetLog(log.Named(catdog_config.Project, xlog.AddCallerSkip(1))))
+	xerror.Panic(xlog.SetLog(log.Named(catdog_config.Domain, xlog.AddCallerSkip(1))))
 	return xerror.Wrap(dix.Dix(p.log))
 }
 
