@@ -12,9 +12,8 @@ import (
 
 import (
 	context "context"
-	api "github.com/micro/go-micro/v3/api"
-	client "github.com/micro/go-micro/v3/client"
-	server "github.com/micro/go-micro/v3/server"
+	client "github.com/asim/nitro/v3/client"
+	server "github.com/asim/nitro/v3/server"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -29,45 +28,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ api.Endpoint
 var _ context.Context
 var _ client.Option
 var _ server.Option
-
-// Api Endpoints for Debug service
-
-func NewDebugEndpoints() []*api.Endpoint {
-	return []*api.Endpoint{
-		&api.Endpoint{
-			Name:    "Debug.Log",
-			Path:    []string{"/log"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-		&api.Endpoint{
-			Name:    "Debug.Health",
-			Path:    []string{"/health"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-		&api.Endpoint{
-			Name:    "Debug.Stats",
-			Path:    []string{"/stats"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-		&api.Endpoint{
-			Name:    "Debug.Trace",
-			Path:    []string{"/trace"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-	}
-}
 
 // Client API for Debug service
 
@@ -150,34 +113,6 @@ func RegisterDebugHandler(s server.Server, hdlr DebugHandler, opts ...server.Han
 		debug
 	}
 	h := &debugHandler{hdlr}
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "Debug.Log",
-		Path:    []string{"/log"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "Debug.Health",
-		Path:    []string{"/health"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "Debug.Stats",
-		Path:    []string{"/stats"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "Debug.Trace",
-		Path:    []string{"/trace"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
 	return s.Handle(s.NewHandler(&Debug{h}, opts...))
 }
 

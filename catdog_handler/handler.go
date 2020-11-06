@@ -1,36 +1,51 @@
 package catdog_handler
 
 import (
-	"github.com/micro/go-micro/v3/server"
+	"github.com/asim/nitro/v3/server"
+	"github.com/pubgo/catdog/catdog_data"
 	"github.com/pubgo/catdog/catdog_server"
 	"github.com/pubgo/xerror"
 	"reflect"
 )
 
 type Handler struct {
-	Register interface{}
-	Handler  interface{}
-	Opts     []server.HandlerOption
+	Handler interface{}
+	Opts    []server.HandlerOption
 }
 
-func New(register, hdlr interface{}, opts ...server.HandlerOption) *Handler {
+func New(hdlr interface{}, opts ...server.HandlerOption) *Handler {
 	return &Handler{
-		Register: register,
-		Handler:  hdlr,
-		Opts:     opts,
+		Handler: hdlr,
+		Opts:    opts,
 	}
 }
 
-func Register(register interface{}, hdlr interface{}, opts ...server.HandlerOption) (err error) {
+func Register(hdlr interface{}, opts ...server.HandlerOption) (err error) {
 	defer xerror.RespErr(&err)
 
-	if register == nil || hdlr == nil {
+	if hdlr == nil {
 		return xerror.New("params should not be nil")
 	}
 
-	vRegister := reflect.ValueOf(register)
-	vHandler := reflect.ValueOf(hdlr)
+	var vRegister reflect.Value
+	hd := reflect.New(unWrapType(reflect.TypeOf(hdlr))).Type()
+	for _, v := range catdog_data.List() {
+		v1 := reflect.TypeOf(v)
+		if v1.NumIn() < 2 {
+			continue
+		}
 
+		if hd.Implements(reflect.TypeOf(v).In(1)) {
+			vRegister = reflect.ValueOf(v)
+			break
+		}
+	}
+
+	if !vRegister.IsValid() || vRegister.IsNil() {
+		return xerror.Fmt("[%s] 没有找到匹配的interface", hd.Name())
+	}
+
+	vHandler := reflect.ValueOf(hdlr)
 	if vRegister.Kind() != reflect.Func ||
 		vRegister.Type().NumIn() < 2 ||
 		vRegister.Type().In(0).String() != "server.Server" {
@@ -52,4 +67,20 @@ func Register(register interface{}, hdlr interface{}, opts ...server.HandlerOpti
 		return xerror.WrapF(ret[0].Interface().(error), "%v, %v", vHandler.Type(), vRegister.Type())
 	}
 	return
+}
+
+func unWrapType(tye reflect.Type) reflect.Type {
+	for isElem(tye) {
+		tye = tye.Elem()
+	}
+	return tye
+}
+
+func isElem(tye reflect.Type) bool {
+	switch tye.Kind() {
+	case reflect.Chan, reflect.Map, reflect.Ptr, reflect.Array, reflect.Slice:
+		return true
+	default:
+		return false
+	}
 }

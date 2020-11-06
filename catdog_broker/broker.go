@@ -1,7 +1,7 @@
 package catdog_broker
 
 import (
-	"github.com/micro/go-micro/v3/broker"
+	"github.com/asim/nitro/v3/broker"
 )
 
 type wrapper struct {

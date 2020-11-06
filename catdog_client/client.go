@@ -1,7 +1,7 @@
 package catdog_client
 
 import (
-	"github.com/micro/go-micro/v3/client"
+	"github.com/asim/nitro/v3/client"
 )
 
 type wrapper struct {

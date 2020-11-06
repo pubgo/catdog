@@ -21,4 +21,6 @@ https://github.com/xtaci/kcp-go
 7. [ ] healthy
 8. [ ] nsq
 9. [ ] redis
-10. [ ] rabbitmq  
+10. [ ] rabbitmq
+
+// 配置，插件，启动

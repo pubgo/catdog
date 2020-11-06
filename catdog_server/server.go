@@ -3,14 +3,14 @@ package catdog_server
 import (
 	"context"
 	"fmt"
-	"github.com/gofiber/fiber"
-	"github.com/micro/go-micro/v3/api"
-	"github.com/micro/go-micro/v3/metadata"
-	"github.com/micro/go-micro/v3/server"
-	"github.com/pubgo/xerror"
 	"net/http"
 	"reflect"
 	"strings"
+
+	"github.com/asim/nitro/v3/metadata"
+	"github.com/asim/nitro/v3/server"
+	"github.com/gofiber/fiber"
+	"github.com/pubgo/xerror"
 )
 
 const defaultContentType = "application/json"
@@ -24,29 +24,32 @@ func (r *wrapper) Handlers() []func(g fiber.Router) error {
 	return r.handlers
 }
 
-func (r *wrapper) httpHandler(httpMethod, relativePath string, handlers ...fiber.Handler) {
+func (r *wrapper) httpHandler(httpMethod, path string, handlers ...fiber.Handler) {
 	r.handlers = append(r.handlers, func(router fiber.Router) error {
 		if router == nil {
-			return xerror.New("please init router group")
+			return xerror.New("[router] should not be nil")
 		}
-		router.Add(httpMethod, relativePath, handlers...)
+
+		router.Add(strings.ToUpper(httpMethod), path, handlers...)
 		return nil
 	})
 }
 
 func (r *wrapper) Handle(handler server.Handler) (err error) {
 	defer xerror.RespErr(&err)
+	if handler == nil {
+		return xerror.New("[handler] should not be nil")
+	}
+
 	xerror.Panic(r.Server.Handle(handler))
 
 	hdr := reflect.ValueOf(handler.Handler())
-	for _, e := range handler.Endpoints() {
-		endpoint := api.Decode(e.Metadata)
-		if len(endpoint.Method) == 0 || endpoint.Method[0] == "" || len(endpoint.Path) == 0 || endpoint.Path[0] == "" {
+	for mthName, httpRule := range handler.Options().Metadata {
+		if httpRule == nil || len(httpRule) == 0 || mthName == "" {
 			continue
 		}
 
-		mthS := strings.Split(e.Name, ".")
-		mth := hdr.MethodByName(mthS[len(mthS)-1])
+		mth := hdr.MethodByName(mthName)
 		mthInType := mth.Type().In(1)
 		mthOutType := mth.Type().In(2)
 
@@ -69,7 +72,14 @@ func (r *wrapper) Handle(handler server.Handler) (err error) {
 			return xerror.Wrap(view.JSON(mthOut.Interface()))
 		}
 
-		r.httpHandler(endpoint.Method[0], endpoint.Path[0], func(view *fiber.Ctx) {
+		var httpMethod, httpPath string
+		for k, v := range httpRule {
+			httpMethod = k
+			httpPath = v
+			break
+		}
+
+		r.httpHandler(httpMethod, httpPath, func(view *fiber.Ctx) {
 			defer xerror.Resp(func(err xerror.XErr) {
 				_ = view.
 					Status(http.StatusInternalServerError).
@@ -97,8 +107,7 @@ func (r *wrapper) Handle(handler server.Handler) (err error) {
 				header:      headers,
 			}
 
-			ctx := context.WithValue(view.Context(), fastHttpRequest{}, view)
-			xerror.Panic(handler(ctx, request, view))
+			xerror.Panic(handler(context.WithValue(view.Context(), fastHttpRequest{}, view), request, view))
 		})
 	}
 

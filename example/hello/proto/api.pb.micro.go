@@ -13,9 +13,8 @@ import (
 
 import (
 	context "context"
-	api "github.com/micro/go-micro/v3/api"
-	client "github.com/micro/go-micro/v3/client"
-	server "github.com/micro/go-micro/v3/server"
+	client "github.com/asim/nitro/v3/client"
+	server "github.com/asim/nitro/v3/server"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -30,31 +29,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ api.Endpoint
 var _ context.Context
 var _ client.Option
 var _ server.Option
-
-// Api Endpoints for TestApi service
-
-func NewTestApiEndpoints() []*api.Endpoint {
-	return []*api.Endpoint{
-		&api.Endpoint{
-			Name:    "TestApi.Version",
-			Path:    []string{"/v1/example/version"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-		&api.Endpoint{
-			Name:    "TestApi.VersionTest",
-			Path:    []string{"/v1/example/versiontest"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-	}
-}
 
 // Client API for TestApi service
 
@@ -111,20 +88,6 @@ func RegisterTestApiHandler(s server.Server, hdlr TestApiHandler, opts ...server
 		testApi
 	}
 	h := &testApiHandler{hdlr}
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "TestApi.Version",
-		Path:    []string{"/v1/example/version"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "TestApi.VersionTest",
-		Path:    []string{"/v1/example/versiontest"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
 	return s.Handle(s.NewHandler(&TestApi{h}, opts...))
 }
 
@@ -138,27 +101,6 @@ func (h *testApiHandler) Version(ctx context.Context, in *TestReq, out *TestApiO
 
 func (h *testApiHandler) VersionTest(ctx context.Context, in *TestReq, out *TestApiOutput) error {
 	return h.TestApiHandler.VersionTest(ctx, in, out)
-}
-
-// Api Endpoints for TestApiV2 service
-
-func NewTestApiV2Endpoints() []*api.Endpoint {
-	return []*api.Endpoint{
-		&api.Endpoint{
-			Name:    "TestApiV2.Version",
-			Path:    []string{"/v2/example/version"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-		&api.Endpoint{
-			Name:    "TestApiV2.VersionTest",
-			Path:    []string{"/v2/example/versiontest"},
-			Method:  []string{"POST"},
-			Body:    "*",
-			Handler: "rpc",
-		},
-	}
 }
 
 // Client API for TestApiV2 service
@@ -216,20 +158,6 @@ func RegisterTestApiV2Handler(s server.Server, hdlr TestApiV2Handler, opts ...se
 		testApiV2
 	}
 	h := &testApiV2Handler{hdlr}
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "TestApiV2.Version",
-		Path:    []string{"/v2/example/version"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:    "TestApiV2.VersionTest",
-		Path:    []string{"/v2/example/versiontest"},
-		Method:  []string{"POST"},
-		Body:    "*",
-		Handler: "rpc",
-	}))
 	return s.Handle(s.NewHandler(&TestApiV2{h}, opts...))
 }
 

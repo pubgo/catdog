@@ -5,12 +5,12 @@ GoROOT=$(shell go env GOROOT)
 BuildTime=$(shell date "+%F %T")
 CommitID=$(shell git rev-parse HEAD)
 LDFLAGS=-ldflags " \
--X 'github.com/pubgo/catdog/version.GoROOT=${GoROOT}' \
--X 'github.com/pubgo/catdog/version.BuildTime=${BuildTime}' \
--X 'github.com/pubgo/catdog/version.GoPath=${GOPath}' \
--X 'github.com/pubgo/catdog/version.CommitID=${CommitID}' \
--X 'github.com/pubgo/catdog/version.Project=${Project}' \
--X 'github.com/pubgo/catdog/version.Version=${Version:-v0.0.1}' \
+-X '${Project}/version.GoROOT=${GoROOT}' \
+-X '${Project}/version.BuildTime=${BuildTime}' \
+-X '${Project}/version.GoPath=${GOPath}' \
+-X '${Project}/version.CommitID=${CommitID}' \
+-X '${Project}/version.Project=${Project}' \
+-X '${Project}/version.Version=${Version:-v0.0.1}' \
 "
 
 .PHONY: build
@@ -43,3 +43,32 @@ tag:tag_list
 	@git push origin ${tg}
 	@git tag -n --sort=committerdate | tee | tail -n 5
 
+
+.PHONY: proto
+proto: clear gen
+	protoc -I. \
+   -I/usr/local/include \
+   -I${GOPATH}/src \
+   -I${GOPATH}/src/github.com/googleapis/googleapis \
+   -I${GOPATH}/src/github.com/gogo/protobuf \
+   --go_out=. \
+   --catdog_out=. \
+	example/proto/hello/*
+
+	protoc -I. \
+   -I/usr/local/include \
+   -I${GOPATH}/src \
+   -I${GOPATH}/src/github.com/googleapis/googleapis \
+   -I${GOPATH}/src/github.com/gogo/protobuf \
+   --go_out=. \
+   --catdog_out=. \
+	example/proto/login/*
+
+.PHONY: clear
+clear:
+	rm -rf example/proto/*.go
+	rm -rf example/proto/**/*.go
+
+.PHONY: gen
+gen:
+	cd cmd/protoc-gen-catdog && go install .

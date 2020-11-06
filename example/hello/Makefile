@@ -8,8 +8,9 @@ proto:
            -I${GOPATH}/src/github.com/googleapis/googleapis \
            -I${GOPATH}/src/github.com/pubgo/catdog/example/hello/proto \
            --proto_path=${GOPATH}/src:. \
-           --micro_out=. \
-           --go_out=${MODIFY}:. \
+           --go-micro_out=. \
+           --go_out=. \
+           --grpc-gateway_out=. \
            proto/*
 
 .PHONY: build

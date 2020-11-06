@@ -1,40 +1,40 @@
-name: "catdog"
-version: "v0.0.1"
-home: ""
-debug: "true"
+app:
+  name: "catdog"
+  version: "v0.0.1"
+  home: ""
+  debug: "true"
 services:
   debug:
     version: "v0.0.1"
   user:
     version: "v0.0.2"
-plugins:
-  config:
-    watcher:
-      address:
-        - "127.0.0.1:2379"
-  etcd:
-    default:
+config:
+  watcher:
+    address:
       - "127.0.0.1:2379"
-      - "127.0.0.1:2389"
-  redis:
-    codis:
-      addr: "127.0.0.1:6379"
-      password: "foobared"
-      db: 0
-    redisSale:
-      addr: "127.0.0.1:6379"
-      password: "foobared"
-      db: 0
-    redisApiBusinessTwo:
-      addr: "127.0.0.1:6379"
-      password: "foobared"
-      db: 0
-    redlock_0:
-      addr: "127.0.0.1:6379"
-      password: "foobared"
-      db: 0
-  mongodb:
-    default:
-      url: "mongodb://localhost:8080"
-  log:
-    level: "catdog_debug_plugin"
+etcd:
+  default:
+    - "127.0.0.1:2379"
+    - "127.0.0.1:2389"
+redis:
+  codis:
+    addr: "127.0.0.1:6379"
+    password: "foobared"
+    db: 0
+  redisSale:
+    addr: "127.0.0.1:6379"
+    password: "foobared"
+    db: 0
+  redisApiBusinessTwo:
+    addr: "127.0.0.1:6379"
+    password: "foobared"
+    db: 0
+  redlock_0:
+    addr: "127.0.0.1:6379"
+    password: "foobared"
+    db: 0
+mongodb:
+  default:
+    url: "mongodb://localhost:8080"
+log:
+  level: "catdog_debug_plugin"

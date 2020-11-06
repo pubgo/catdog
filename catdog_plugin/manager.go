@@ -2,6 +2,7 @@ package catdog_plugin
 
 import (
 	"encoding/json"
+	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xerror/xerror_util"
 	"sync"
@@ -65,10 +66,11 @@ func (m *manager) Register(pg Plugin, opts ...ManagerOption) error {
 		o(&options)
 	}
 
+	name := pg.String()
+
 	m.Lock()
 	defer m.Unlock()
 
-	name := pg.String()
 	if reg, ok := m.registered[options.Module]; ok && reg[name] {
 		return xerror.Fmt("Plugin [%s] Already Registered", name)
 	}
@@ -85,7 +87,7 @@ func (m *manager) Register(pg Plugin, opts ...ManagerOption) error {
 		m.plugins[options.Module] = append(m.plugins[options.Module], pg)
 	}
 
-	return nil
+	return xerror.Wrap(catdog_config.Watch(name, pg.Watch))
 }
 
 func (m *manager) isRegistered(plg Plugin, opts ...ManagerOption) bool {

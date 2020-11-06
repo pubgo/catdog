@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/micro/go-micro/v3/metadata"
+	"github.com/asim/nitro/v3/metadata"
 )
 
 const (

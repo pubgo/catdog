@@ -1,7 +1,9 @@
 package catdog_broker
 
 import (
-	"github.com/micro/go-micro/v3/broker/http"
+	mBroker "github.com/asim/nitro/v3/broker/memory"
 )
 
-var Default = &wrapper{Broker: http.NewBroker()}
+var (
+	Default = &wrapper{Broker: mBroker.NewBroker()}
+)

@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
@@ -34,8 +34,8 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 	return nil
 }
 
-func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) error {
-	cat.Init(catdog_abc.BeforeStart(func() error {
+func (p *Plugin) catDogWatcher(cat catdog_app.CatDog) error {
+	cat.Init(catdog_app.BeforeStart(func() error {
 		return xerror.Wrap(checkRunMode())
 	}))
 	return xerror.Wrap(dix.Dix(p))
@@ -45,7 +45,7 @@ func New() *Plugin {
 	p := &Plugin{
 		name: "runmode",
 	}
-	xerror.Exit(catdog_abc.Watch(p.catDogWatcher))
+	xerror.Exit(catdog_app.Watch(p.catDogWatcher))
 	return p
 }
 

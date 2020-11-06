@@ -2,6 +2,7 @@ package catdog_tracing_plugin
 
 import (
 	"context"
+
 	"github.com/pubgo/catdog/internal/tracing"
 )
 

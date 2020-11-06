@@ -1,7 +1,7 @@
 package catdog_log_plugin
 
 import (
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
@@ -19,7 +19,6 @@ var _ catdog_plugin.Plugin = (*Plugin)(nil)
 type Plugin struct {
 	name   string
 	config xlog_config.Config
-	log    xlog.XLog
 }
 
 func (p *Plugin) Commands() *cobra.Command {
@@ -34,15 +33,14 @@ func (p *Plugin) String() string {
 	return p.name
 }
 
-func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (rErr error) {
-	defer xerror.RespErr(&rErr)
+func (p *Plugin) cfgWatcher(r reader.Value) error {
+	var config = xlog_config.NewDevConfig()
+	xerror.Panic(r.Scan(&config))
 
-	zapL := xerror.PanicErr(xlog_config.NewZapLoggerFromConfig(p.config)).(*zap.Logger)
+	zapL := xerror.PanicErr(xlog_config.NewZapLoggerFromConfig(config)).(*zap.Logger)
 	log := xlog.New(zapL.WithOptions(xlog.AddCaller(), xlog.AddCallerSkip(1)))
-	p.log = log.Named(catdog_config.Domain)
-
 	xerror.Panic(xlog.SetLog(log.Named(catdog_config.Domain, xlog.AddCallerSkip(1))))
-	return xerror.Wrap(dix.Dix(p.log))
+	return xerror.Wrap(dix.Dix(log.Named(catdog_config.Domain)))
 }
 
 func (p *Plugin) Flags() *pflag.FlagSet {
@@ -56,7 +54,6 @@ func New() *Plugin {
 		name:   "log",
 		config: xlog_config.NewDevConfig(),
 	}
-	xerror.Exit(catdog_abc.Watch(p.catDogWatcher))
-
+	xerror.Exit(catdog_config.Watch("log", p.cfgWatcher))
 	return p
 }

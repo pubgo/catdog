@@ -1,7 +1,7 @@
 package catdog_server
 
 import (
-	"github.com/micro/go-micro/v3/codec"
+	"github.com/asim/nitro/v3/codec"
 )
 
 type httpRequest struct {

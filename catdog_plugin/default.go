@@ -1,5 +1,12 @@
 package catdog_plugin
 
+import (
+	"fmt"
+	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/dix"
+	"github.com/pubgo/xerror"
+)
+
 const defaultModule = "__catdog"
 
 var defaultManager = newManager()
@@ -30,4 +37,12 @@ func IsRegistered(plugin Plugin, opts ...ManagerOption) bool {
 
 func Of(pl ...Plugin) []Plugin {
 	return pl
+}
+
+func init() {
+	xerror.Exit(dix.WithBeforeStart(func() {
+		if catdog_config.Trace {
+			fmt.Println("plugins", String())
+		}
+	}))
 }

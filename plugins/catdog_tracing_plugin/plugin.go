@@ -1,12 +1,13 @@
 package catdog_tracing_plugin
 
 import (
+	"io"
+	"strings"
+
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"io"
-	"strings"
 )
 
 var tracerCloser io.Closer

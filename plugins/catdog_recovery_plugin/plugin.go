@@ -1,7 +1,7 @@
 package catdog_recovery_plugin
 
 import (
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/dix"
@@ -28,7 +28,7 @@ func (p *Plugin) String() string {
 	return p.name
 }
 
-func (p *Plugin) catdogWatcher(cat catdog_abc.CatDog) (rErr error) {
+func (p *Plugin) catdogWatcher(cat catdog_app.CatDog) (rErr error) {
 	defer xerror.RespErr(&rErr)
 
 	cat.Init(p.clientWrap(), p.handlerWrap())
@@ -45,7 +45,7 @@ func New() *Plugin {
 		name: "recovery",
 	}
 
-	catdog_abc.Watch(p.catdogWatcher)
+	catdog_app.Watch(p.catdogWatcher)
 
 	return p
 

@@ -2,11 +2,12 @@ package catdog_log
 
 import (
 	"fmt"
-	"github.com/pubgo/xerror"
 	"sync"
 
-	"github.com/micro/go-micro/v3/logger"
+	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
+
+	"github.com/asim/nitro/v3/logger"
 )
 
 func init() {

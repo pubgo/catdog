@@ -3,10 +3,10 @@ package catdog_tracing_plugin
 import (
 	"context"
 	"fmt"
-	"github.com/pubgo/catdog/internal/tracing"
 
-	"github.com/micro/go-micro/v3/client"
-	"github.com/micro/go-micro/v3/server"
+	"github.com/pubgo/catdog/internal/tracing"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/server"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 

@@ -2,7 +2,7 @@ package catdog_pidfile_plugin
 
 import (
 	"fmt"
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
@@ -72,8 +72,8 @@ func (p *Plugin) SavePid() error {
 	return xerror.Wrap(ioutil.WriteFile(f, pidBytes, pidPerm))
 }
 
-func (p *Plugin) Init(cat catdog_abc.CatDog) error {
-	cat.Init(catdog_abc.AfterStart(p.SavePid))
+func (p *Plugin) Init(cat catdog_app.CatDog) error {
+	cat.Init(catdog_app.AfterStart(p.SavePid))
 	return xerror.Wrap(dix.Dix(p))
 }
 
@@ -94,6 +94,6 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 func New() *Plugin {
 	return &Plugin{
 		name:    "pidfile",
-		pidPath: filepath.Join(catdog_config.CfgDir, "pidfile"),
+		pidPath: filepath.Join(catdog_config.Home, "pidfile"),
 	}
 }

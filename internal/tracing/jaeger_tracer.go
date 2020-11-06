@@ -9,7 +9,7 @@ import (
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/uber/jaeger-client-go"
 
-	"github.com/micro/go-micro/v3/metadata"
+	"github.com/asim/nitro/v3/metadata"
 	"github.com/opentracing/opentracing-go"
 )
 
@@ -190,7 +190,7 @@ func GetParentSpanContext(
 	var errRet error
 	// Find parent span.
 	// First try to get span within current service boundary.
-	// If there doesn't exist, try to get it from go-micro metadata(which is cross boundary)
+	// If there doesn't exist, try to get it from nitro metadata(which is cross boundary)
 	if span := opentracing.SpanFromContext(ctx); span != nil {
 		parentSpanCtx = span.Context()
 	} else if spanCtx, err := tracer.Extract(opentracing.TextMap, opentracing.TextMapCarrier(md)); err == nil {

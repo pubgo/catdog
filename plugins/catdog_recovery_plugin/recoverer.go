@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/micro/go-micro/v3/client"
-	"github.com/micro/go-micro/v3/server"
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/server"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/internal/tracing"
 	"time"
 )
 
-func (p *Plugin) handlerWrap() catdog_abc.Option {
-	return catdog_abc.WrapHandler(func(handlerFunc server.HandlerFunc) server.HandlerFunc {
+func (p *Plugin) handlerWrap() catdog_app.Option {
+	return catdog_app.WrapHandler(func(handlerFunc server.HandlerFunc) server.HandlerFunc {
 		return func(ctx context.Context, req server.Request, rsp interface{}) error {
 			t := time.Now()
 			defer func() {
@@ -60,8 +60,8 @@ func (p *Plugin) handlerWrap() catdog_abc.Option {
 	})
 }
 
-func (p *Plugin) clientWrap() catdog_abc.Option {
-	return catdog_abc.WrapCall(func(callFunc client.CallFunc) client.CallFunc {
+func (p *Plugin) clientWrap() catdog_app.Option {
+	return catdog_app.WrapCall(func(callFunc client.CallFunc) client.CallFunc {
 		return func(ctx context.Context, addr string, req client.Request, rsp interface{}, opts client.CallOptions) error {
 			defer func() {
 				if err := recover(); err != nil {

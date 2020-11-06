@@ -1,11 +1,12 @@
 package version
 
 import (
-	"github.com/coreos/etcd/version"
+	"runtime"
+
+	"github.com/pubgo/xerror"
+
 	ver "github.com/hashicorp/go-version"
 	"github.com/pubgo/catdog/catdog_version"
-	"github.com/pubgo/xerror"
-	"runtime"
 )
 
 var BuildTime = ""
@@ -21,11 +22,8 @@ func init() {
 		Version = "v0.0.1"
 	}
 
-	xerror.ExitErr(ver.NewVersion(version.Version))
-}
-
-func Init() {
-	catdog_version.Register("catdog_version", catdog_version.M{
+	xerror.ExitErr(ver.NewVersion(Version))
+	xerror.Exit(catdog_version.Register("catdog_version", catdog_version.M{
 		"build_time": BuildTime,
 		"version":    Version,
 		"go_version": GoVersion,
@@ -33,5 +31,5 @@ func Init() {
 		"go_root":    GoROOT,
 		"commit_id":  CommitID,
 		"project":    Project,
-	})
+	}))
 }

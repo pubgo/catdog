@@ -1,7 +1,7 @@
 package catdog_rabbitmq_plugin
 
 import (
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_log"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/dix"
@@ -21,7 +21,7 @@ func (p *Plugin) GetClient(name string) {
 
 }
 
-func (p *Plugin) Init(cat catdog_abc.CatDog) (rErr error) {
+func (p *Plugin) Init(cat catdog_app.CatDog) (rErr error) {
 	defer xerror.RespErr(&rErr)
 
 	return xerror.Wrap(dix.Dix(p))

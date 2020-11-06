@@ -1,7 +1,7 @@
 package catdog_debug_plugin
 
 import (
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/catdog/plugins/catdog_debug_plugin/handler"
@@ -32,7 +32,6 @@ func (p *Plugin) String() string {
 
 func (p *Plugin) Handler() *catdog_handler.Handler {
 	return catdog_handler.New(
-		debug.RegisterDebugHandler,
 		handler.NewHandler(),
 		//api.WithEndpoint(&api.Endpoint{
 		//	name:    "TestApi.Version",
@@ -44,7 +43,7 @@ func (p *Plugin) Handler() *catdog_handler.Handler {
 	)
 }
 
-func (p *Plugin) Init(cat catdog_abc.CatDog) error {
+func (p *Plugin) Init(cat catdog_app.CatDog) error {
 	return xerror.Wrap(dix.Dix(p))
 }
 

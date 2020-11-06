@@ -1,20 +1,20 @@
-// Package handler implements catdog_service catdog_debug_plugin handler embedded in go-micro services
+// Package handler implements catdog_service catdog_debug_plugin handler embedded in nitro services
 package handler
 
 import (
 	"context"
 	"time"
 
-	"github.com/micro/go-micro/v3/debug/log"
-	"github.com/micro/go-micro/v3/debug/stats"
-	"github.com/micro/go-micro/v3/debug/trace"
+	"github.com/asim/nitro/v3/debug/log"
+	"github.com/asim/nitro/v3/debug/stats"
+	"github.com/asim/nitro/v3/debug/trace"
 
 	pb "github.com/pubgo/catdog/plugins/catdog_debug_plugin/proto"
 
-	memLog "github.com/micro/go-micro/v3/debug/log/memory"
-	"github.com/micro/go-micro/v3/debug/profile"
-	memStats "github.com/micro/go-micro/v3/debug/stats/memory"
-	memTrace "github.com/micro/go-micro/v3/debug/trace/memory"
+	memLog "github.com/asim/nitro/v3/debug/log/memory"
+	"github.com/asim/nitro/v3/debug/profile"
+	memStats "github.com/asim/nitro/v3/debug/stats/memory"
+	memTrace "github.com/asim/nitro/v3/debug/trace/memory"
 )
 
 var (

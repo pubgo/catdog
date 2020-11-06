@@ -1,8 +1,8 @@
 package catdog_client_plugin
 
 import (
-	"github.com/micro/go-micro/v3/client"
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/asim/nitro/v3/client"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_client"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
@@ -35,7 +35,7 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 	return nil
 }
 
-func (p *Plugin) Init(cat catdog_abc.CatDog) error {
+func (p *Plugin) Init(cat catdog_app.CatDog) error {
 
 	//Default.initCatDog()
 
@@ -48,3 +48,10 @@ func New() *Plugin {
 		Options: catdog_client.Default.Options(),
 	}
 }
+
+func Client(c client.Client) Option {
+	return func(o *Options) {
+		o.Client = c
+	}
+}
+

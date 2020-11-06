@@ -1,8 +1,8 @@
 package catdog_server_plugin
 
 import (
-	"github.com/micro/go-micro/v3/server"
-	"github.com/pubgo/catdog/catdog_abc"
+	"github.com/asim/nitro/v3/server"
+	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/catdog/catdog_server"
@@ -38,7 +38,7 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 	return flags
 }
 
-func (p *Plugin) catDogWatcher(cat catdog_abc.CatDog) (err error) {
+func (p *Plugin) catDogWatcher(cat catdog_app.CatDog) (err error) {
 	defer xerror.RespErr(&err)
 	return xerror.Wrap(dix.Dix(p))
 }
@@ -47,7 +47,14 @@ func New() *Plugin {
 	p := &Plugin{
 		Options: catdog_server.Default.Options(),
 	}
-	xerror.Exit(catdog_abc.Watch(p.catDogWatcher))
+	xerror.Exit(catdog_app.Watch(p.catDogWatcher))
 
 	return p
+}
+
+// Server sets the catdog_server_plugin for handling requests
+func Server(s server.Server) Option {
+	return func(o *Options) {
+		o.Server = s
+	}
 }

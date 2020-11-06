@@ -2,85 +2,94 @@ package catdog_config
 
 import (
 	"context"
-	"github.com/micro/go-micro/v3/config"
-	"github.com/micro/go-micro/v3/config/reader"
+	"path/filepath"
+	"strings"
+
+	"github.com/asim/nitro/v3/config"
+	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
-	"os"
-	"strings"
+	"github.com/spf13/pflag"
 )
 
-func Env(env *string, names ...string) {
-	getEnv(env, names...)
+func DefaultFlags() *pflag.FlagSet {
+	flags := pflag.NewFlagSet("app", pflag.PanicOnError)
+	flags.StringVarP(&Mode, "mode", "m", Mode, "running mode(dev|test|stag|prod|release)")
+	flags.StringVarP(&Home, "home", "c", Home, "project config home dir")
+	flags.BoolVarP(&Debug, "debug", "d", Debug, "enable debug")
+	flags.BoolVarP(&Trace, "trace", "t", Trace, "enable trace")
+	flags.StringVarP(&Project, "project", "p", Project, "project name")
+	return flags
 }
 
-func SysEnv(env *string, names ...string) {
-	getSysEnv(env, names...)
+type Config struct {
+	config.Config
 }
 
-func getSysEnv(val *string, names ...string) {
-	for _, name := range names {
-		env, ok := os.LookupEnv(strings.ToUpper(name))
-		env = strings.TrimSpace(env)
-		if ok && env != "" {
-			*val = env
-		}
+// 默认的全局配置
+var (
+	Domain  = "catdog"
+	Project = "catdog"
+	Debug   = true
+	Trace   = false
+	Mode    = "dev"
+	Home    = xerror.PanicStr(filepath.Abs(filepath.Dir("")))
+	cfg     *Config
+)
+
+// RunMode 项目运行模式
+var RunMode = struct {
+	Dev     string
+	Test    string
+	Stag    string
+	Prod    string
+	Release string
+}{
+	Dev:     "dev",
+	Test:    "test",
+	Stag:    "stag",
+	Prod:    "prod",
+	Release: "release",
+}
+
+func Init(opts ...config.Option) {
+	xerror.Exit(cfg.Init(opts...))
+}
+
+func Load(path ...string) (reader.Value, error) {
+	return cfg.Load(path...)
+}
+
+func LoadBytes() []byte {
+	return xerror.PanicErr(cfg.Load()).(reader.Value).Bytes()
+}
+
+func Watch(name string, watcher func(r reader.Value) error) error {
+	if name == "" {
+		return xerror.Fmt("[name] should not be empty")
 	}
-}
 
-func getEnv(val *string, names ...string) {
-	for _, name := range names {
-
-		if Domain == "" {
-			name = strings.ToUpper(name)
-		} else {
-			name = strings.ToUpper(strings.Join([]string{Domain, name}, "_"))
-		}
-
-		env, ok := os.LookupEnv(strings.ToUpper(name))
-		env = strings.TrimSpace(env)
-		if ok && env != "" {
-			*val = env
-		}
+	if watcher == nil {
+		return xerror.Fmt("[watcher] should not be nil")
 	}
-}
 
-func PluginPrefix(names ...string) []string {
-	return append([]string{Domain, Project, "plugins"}, names...)
-}
-
-func ProjectPrefix() []string {
-	return []string{Domain, Project}
-}
-
-func WatchStart() error {
-	return xerror.Wrap(dix.Start())
-}
-
-func WatchStop() error {
-	return xerror.Wrap(dix.Stop())
-}
-
-func Watch(name string, watcher func(r reader.Value) error) {
-	xerror.Exit(dix.Dix(func(ctx *dix.StartCtx) {
-		if name == "" {
-			return
-		}
-		if watcher == nil {
-			return
+	return xerror.Wrap(dix.WithBeforeStart(func() {
+		key := strings.Join([]string{Project, name}, ".")
+		resp := xerror.PanicErr(cfg.Load(key)).(reader.Value)
+		if resp.Bytes() != nil {
+			xerror.Panic(watcher(resp))
 		}
 
-		wKey := strings.Join(PluginPrefix(name), "/")
-		xlog.DebugF("Start Config Watch, Key: %s", wKey)
-		w := xerror.PanicErr(cfg.Watch(wKey)).(config.Watcher)
+		xlog.Debugf("Start Watch Config, Key: %s", key)
+		w := xerror.PanicErr(cfg.Watch(key)).(config.Watcher)
 
-		// 开启监听配置变化
+		// 开启监听配置
 		cancel := xprocess.Go(func(ctx context.Context) (err error) {
 			defer xerror.RespErr(&err)
 			defer func() {
-				xlog.DebugF("Stop Config Watch, Key: %s", wKey)
+				xlog.Debugf("Stop Watch Config, Key: %s", key)
 				xerror.Panic(w.Stop())
 			}()
 
@@ -100,8 +109,6 @@ func Watch(name string, watcher func(r reader.Value) error) {
 		})
 
 		// 关闭监听配置变化
-		xerror.Exit(dix.Dix(func(stopCtx *dix.StopCtx) error {
-			return xerror.Wrap(cancel())
-		}))
+		xerror.Exit(dix.WithAfterStart(func() { xerror.Exit(cancel()) }))
 	}))
 }

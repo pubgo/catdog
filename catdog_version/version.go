@@ -10,8 +10,12 @@ var versions sync.Map
 
 type M = map[string]string
 
-func Register(name string, data M) {
-	versions.Store(name, data)
+func Register(name string, data M) error {
+	_, ok := versions.LoadOrStore(name, data)
+	if ok {
+		return xerror.Fmt("[name]:%s already exists")
+	}
+	return nil
 }
 
 func Get(name string) (v M) {
