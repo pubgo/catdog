@@ -7,9 +7,9 @@ import (
 	"github.com/pubgo/catdog"
 	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/catdog_log"
 	"github.com/pubgo/catdog/example/hello/handler"
 	helloworld "github.com/pubgo/catdog/example/hello/proto"
+	"github.com/pubgo/catdog/plugins/catdog_log"
 	"github.com/pubgo/catdog/version"
 )
 

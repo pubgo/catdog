@@ -6,22 +6,20 @@ import (
 
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/catdog/catdog_server"
+	"github.com/pubgo/catdog/plugins/catdog_server"
 )
 
 func Start(ent catdog_entry.Entry) (err error) {
 	defer xerror.RespErr(&err)
 
 	// 启动配置, 初始化组件
-	nameModule := catdog_plugin.Module(ent.Options().Name)
-	plugins := append(catdog_plugin.List(), catdog_plugin.List(nameModule)...)
-	for _, pl := range plugins {
+	entPlugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))
+	for _, pl := range append(catdog_plugin.List(), entPlugins...) {
+		xerror.Exit(pl.Init())
 		hdlr := pl.Handler()
-		if hdlr == nil {
-			continue
+		if hdlr != nil {
+			xerror.Panic(ent.Handler(hdlr, hdlr.Opts...))
 		}
-
-		xerror.Panic(ent.Handler(hdlr, hdlr.Opts...))
 	}
 
 	xerror.Panic(dix.BeforeStart())

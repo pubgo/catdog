@@ -3,26 +3,25 @@ package catdog_entry
 import (
 	"context"
 	"fmt"
-	"github.com/pubgo/catdog/catdog_data"
-	"github.com/pubgo/catdog/catdog_handler"
-	"github.com/pubgo/catdog/catdog_plugin"
+	"github.com/pubgo/dix"
 	"github.com/pubgo/xprocess"
-	"github.com/spf13/cobra"
 	"net/http"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/asim/nitro/v3/server"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
-
-	"github.com/asim/nitro/v3/server"
-	"github.com/pubgo/catdog/catdog_app"
-	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/catdog_server"
+	ver "github.com/hashicorp/go-version"
 	"github.com/pubgo/xerror"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/catdog/catdog_handler"
+	"github.com/pubgo/catdog/catdog_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_server"
 )
 
 var _ Entry = (*rpcEntry)(nil)
@@ -43,41 +42,6 @@ func (r *rpcEntry) Group(relativePath string, handlers ...fiber.Handler) fiber.R
 	return r.app.Group(relativePath, handlers...)
 }
 
-func (r *rpcEntry) initFlags() error {
-	return xerror.Wrap(r.Flags(func(flags *pflag.FlagSet) {
-		flags.StringVar(&r.addr, "gw_addr", r.addr, "gateway address")
-	}))
-}
-
-func (r *rpcEntry) stopService() error {
-	if err := r.app.Shutdown(); err != nil && err != http.ErrServerClosed {
-		return xerror.Wrap(err)
-	}
-	return nil
-}
-
-func (r *rpcEntry) pathRouterTrace() error {
-	if catdog_config.Trace {
-		for _, stacks := range r.app.Stack() {
-			for _, stack := range stacks {
-				log.DebugF("%s %s", stack.Method, stack.Path)
-			}
-		}
-	}
-	return nil
-}
-
-func (r *rpcEntry) startService() error {
-	xprocess.Go(func(ctx context.Context) (err error) {
-		defer xerror.RespErr(&err)
-		log.InfoF("Server [http] Listening on http://%s", r.addr)
-		xerror.Exit(r.app.Listen(r.addr))
-		log.InfoF("Server [http] Closed OK")
-		return nil
-	})
-	return nil
-}
-
 func (r *rpcEntry) middleware() []interface{} {
 	return []interface{}{
 		middleware.Recover(),
@@ -87,27 +51,6 @@ func (r *rpcEntry) middleware() []interface{} {
 		}),
 	}
 
-}
-
-func (r *rpcEntry) initCatDog(cat catdog_app.CatDog) (err error) {
-	xerror.RespErr(&err)
-
-	opts := r.Options()
-	cat.Init(catdog_app.Name(opts.Name), catdog_app.Version(opts.Version))
-	cat.Init(opts.Options...)
-	cat.Init(
-		catdog_app.BeforeStart(r.startService),
-		catdog_app.BeforeStop(r.stopService),
-		catdog_app.AfterStart(r.pathRouterTrace),
-	)
-
-	g := r.app.Group(r.gwPrefix)
-	handlers := catdog_server.Default.Handlers()
-	for i := range handlers {
-		xerror.Panic(handlers[i](g))
-	}
-
-	return nil
 }
 
 func (r *rpcEntry) Options() Options {
@@ -139,34 +82,39 @@ func (r *rpcEntry) Name(name string, description ...string) error {
 func (r *rpcEntry) Version(v string) error {
 	r.opts.Version = strings.TrimSpace(v)
 	if r.opts.Version == "" {
-		return xerror.New("version should not be null")
+		return xerror.New("[version] should not be null")
 	}
-	return nil
+
+	_, err := ver.NewVersion(v)
+	return xerror.WrapF(err, "[v] version format error")
 }
 
 func (r *rpcEntry) Commands(commands ...*cobra.Command) error {
-	for _, command := range commands {
-		if command == nil {
+	rootCmd := r.opts.Command
+	for _, cmd := range commands {
+		if cmd == nil {
 			continue
 		}
-		r.opts.Command.AddCommand(command)
+
+		if rootCmd.Name() == cmd.Name() {
+			return xerror.Fmt("command(%s) already exists", cmd.Name())
+		}
+
+		rootCmd.AddCommand(cmd)
 	}
 	return nil
 }
 
 // func(s server.Server, handle TestHandler, opts ...server.HandlerOption) error
 func (r *rpcEntry) Handler(hdlr interface{}, opts ...server.HandlerOption) error {
-	return xerror.Wrap(catdog_handler.Register(hdlr,opts...))
+	return xerror.Wrap(catdog_handler.Register(hdlr, opts...))
 }
 
 func (r *rpcEntry) Plugins(pgs ...catdog_plugin.Plugin) (err error) {
 	defer xerror.RespErr(&err)
 
 	for _, pg := range pgs {
-		xerror.PanicF(catdog_plugin.Register(pg,
-			catdog_plugin.Module(r.opts.Name)), "Plugin [%s] Register error", pg.String())
-		xerror.Panic(r.Flags(func(flag *pflag.FlagSet) { flag.AddFlagSet(pg.Flags()) }))
-		xerror.Panic(r.Commands(pg.Commands()))
+		xerror.PanicF(catdog_plugin.Register(pg, catdog_plugin.Module(r.opts.Name)), "Plugin [%s] Register error", pg.String())
 	}
 
 	return
@@ -184,27 +132,50 @@ func newEntry() *rpcEntry {
 	}
 	ent.opts.Command.AddCommand(ent.opts.RunCommand)
 	ent.app.Use(ent.middleware()...)
-	xerror.Exit(ent.initFlags())
-	xerror.Exit(catdog_app.Watch(ent.initCatDog))
+
+	xerror.Exit(ent.Flags(func(flags *pflag.FlagSet) {
+		flags.StringVar(&ent.addr, "gw_addr", ent.addr, "gateway address")
+	}))
+
+	xerror.Exit(dix.WithBeforeStart(func() {
+		g := ent.app.Group(ent.gwPrefix)
+		handlers := catdog_server.Default.Handlers()
+		for i := range handlers {
+			xerror.Panic(handlers[i](g))
+		}
+
+		cancel := xprocess.Go(func(ctx context.Context) (err error) {
+			defer xerror.RespErr(&err)
+			log.Infof("Server [http] Listening on http://%s", ent.addr)
+			xerror.Exit(ent.app.Listen(ent.addr))
+			log.Infof("Server [http] Closed OK")
+			return nil
+		})
+
+		xerror.Exit(dix.WithBeforeStop(func() {
+			xerror.Panic(cancel())
+		}))
+	}))
+
+	xerror.Exit(dix.WithAfterStart(func() {
+		if catdog_config.Trace {
+			for _, stacks := range ent.app.Stack() {
+				for _, stack := range stacks {
+					log.Debugf("%s %s", stack.Method, stack.Path)
+				}
+			}
+		}
+	}))
+
+	xerror.Exit(dix.WithAfterStop(func() {
+		if err := ent.app.Shutdown(); err != nil && err != http.ErrServerClosed {
+			fmt.Println(xerror.Parse(err).Println())
+		}
+	}))
+
 	return ent
 }
 
 func New() Entry {
 	return newEntry()
-}
-
-func unWrapType(tye reflect.Type) reflect.Type {
-	for isElem(tye) {
-		tye = tye.Elem()
-	}
-	return tye
-}
-
-func isElem(tye reflect.Type) bool {
-	switch tye.Kind() {
-	case reflect.Chan, reflect.Map, reflect.Ptr, reflect.Array, reflect.Slice:
-		return true
-	default:
-		return false
-	}
 }

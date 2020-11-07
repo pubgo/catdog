@@ -1,11 +1,7 @@
 package catdog
 
 import (
-	"fmt"
 	"path/filepath"
-
-	"github.com/pubgo/dix"
-	"github.com/pubgo/xerror"
 
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/source"
@@ -14,8 +10,7 @@ import (
 	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
-	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/catdog/plugins/config/encoder/yaml"
+	"github.com/pubgo/catdog/internal/plugins/config/encoder/yaml"
 )
 
 func Run(entries ...Entry) error {
@@ -41,14 +36,7 @@ func Init(project string) error {
 	//		mEtcd.StripPrefix(true),
 	//	),
 	//))
-
-	xerror.Exit(dix.WithBeforeStart(func() {
-		if catdog_config.Trace {
-			fmt.Println("deps", dix.Graph())
-			fmt.Println("config", string(catdog_config.LoadBytes()))
-			fmt.Println("plugins", catdog_plugin.String())
-		}
-	}))
+	return nil
 }
 
 type Entry = catdog_entry.Entry

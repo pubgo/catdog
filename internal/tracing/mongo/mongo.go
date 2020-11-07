@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/pubgo/catdog/internal/tracing"
-	"github.com/pubgo/catdog/plugins/catdog_mongo_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_mongo"
 	"github.com/pubgo/xlog"
 	"sync"
 	"time"
-
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -30,7 +29,7 @@ func GetMongoClient(prefix string) (*mongo.Client, error) {
 		}
 	}
 
-	clientAndOpts, err := catdog_mongo_plugin.PickupMongoClient(prefix)
+	clientAndOpts, err := catdog_mongo.PickupMongoClient(prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +52,7 @@ func injectMonitor(prefix string) error {
 	opts.SetConnectTimeout(default_timeout)
 	opts.SetServerSelectionTimeout(default_timeout)
 
-	if err := catdog_mongo_plugin.RefreshClient(prefix, opts); err != nil {
+	if err := catdog_mongo.RefreshClient(prefix, opts); err != nil {
 		xlog.ErrorF("Tracing.catdog_mongo_plugin refresh error:%s", err)
 		return err
 	}

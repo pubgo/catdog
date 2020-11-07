@@ -12,22 +12,31 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_plugin"
+	"github.com/pubgo/catdog/version"
 )
 
 func Run(entries ...catdog_entry.Entry) (err error) {
 	defer xerror.RespErr(&err)
-
-	var rootCmd = &cobra.Command{Use: catdog_config.Domain}
-	rootCmd.PersistentFlags().AddFlagSet(catdog_config.DefaultFlags())
-	rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return xerror.Wrap(cmd.Help()) }
 
 	if len(entries) == 0 {
 		return xerror.New("[entries] should not be zero")
 	}
 
 	for _, ent := range entries {
+		if ent == nil {
+			return xerror.New("[ent] should not be nil")
+		}
+	}
+
+	var rootCmd = &cobra.Command{Use: catdog_config.Domain, Version: version.Version}
+	rootCmd.PersistentFlags().AddFlagSet(catdog_config.DefaultFlags())
+	rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return xerror.Wrap(cmd.Help()) }
+
+	for _, ent := range entries {
 		cmd := ent.Options().Command
-		runCmd := ent.Options().RunCommand
+		cmd.Version = ent.Options().Version
+		cmd.Use = ent.Options().Name
+		cmd.Short = ent.Options().Description
 
 		// 检查Command是否注册
 		for _, c := range rootCmd.Commands() {
@@ -36,24 +45,23 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 			}
 		}
 
-		// 注册插件
-		nameModule := catdog_plugin.Module(ent.Options().Name)
-		plugins := append(catdog_plugin.List(), catdog_plugin.List(nameModule)...)
-		for _, pl := range plugins {
+		// 注册plugin的command和flags
+		entPlugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))
+		for _, pl := range append(catdog_plugin.List(), entPlugins...) {
 			cmd.PersistentFlags().AddFlagSet(pl.Flags())
-
-			if pl.Commands() != nil {
-				cmd.AddCommand(pl.Commands())
-			}
+			xerror.Panic(ent.Commands(pl.Commands()))
 		}
 
+		runCmd := ent.Options().RunCommand
 		runCmd.RunE = func(cmd *cobra.Command, args []string) (err error) {
 			defer xerror.RespErr(&err)
 
 			xerror.Panic(Start(ent))
 
-			ch := make(chan os.Signal, 1)
-			signal.Notify(ch, append(signalUtil.Shutdown(), syscall.SIGHUP)...)
+			if catdog_config.IsBlock {
+				ch := make(chan os.Signal, 1)
+				signal.Notify(ch, append(signalUtil.Shutdown(), syscall.SIGHUP)...)
+			}
 
 			xerror.Panic(Stop())
 			return nil

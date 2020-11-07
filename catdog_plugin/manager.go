@@ -2,10 +2,11 @@ package catdog_plugin
 
 import (
 	"encoding/json"
-	"github.com/pubgo/catdog/catdog_config"
+	"sync"
+
+	"github.com/pubgo/catdog/plugins/catdog_watcher"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xerror/xerror_util"
-	"sync"
 )
 
 // NewManager creates a new internal_plugin manager
@@ -87,7 +88,7 @@ func (m *manager) Register(pg Plugin, opts ...ManagerOption) error {
 		m.plugins[options.Module] = append(m.plugins[options.Module], pg)
 	}
 
-	return xerror.Wrap(catdog_config.Watch(name, pg.Watch))
+	return xerror.Wrap(catdog_watcher.Watch(name, pg.Watch))
 }
 
 func (m *manager) isRegistered(plg Plugin, opts ...ManagerOption) bool {

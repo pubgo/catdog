@@ -23,6 +23,7 @@ type ManagerOptions struct {
 // the micro API, Web, Sidecar, CLI. It's a method of building middleware for the HTTP side.
 type Plugin interface {
 	Watch(r reader.Value) error
+	Init() error
 	Flags() *pflag.FlagSet
 	Commands() *cobra.Command
 	Handler() *catdog_handler.Handler

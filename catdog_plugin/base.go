@@ -13,6 +13,10 @@ type basePlugin struct {
 	name string
 }
 
+func (p *basePlugin) Init() error {
+	return nil
+}
+
 func (p *basePlugin) Watch(r reader.Value) error {
 	return nil
 }

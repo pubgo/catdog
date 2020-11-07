@@ -2,16 +2,21 @@ package catdog_config
 
 import (
 	"fmt"
-	"github.com/pubgo/dix"
+	"path/filepath"
 	"strings"
 
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/memory"
+	"github.com/asim/nitro/v3/config/source"
 	mEnv "github.com/asim/nitro/v3/config/source/env"
+	mFile "github.com/asim/nitro/v3/config/source/file"
+	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 
 	"github.com/pubgo/catdog/catdog_env"
+	"github.com/pubgo/catdog/catdog_util"
+	"github.com/pubgo/catdog/internal/plugins/config/encoder/yaml"
 )
 
 func init() {
@@ -27,19 +32,46 @@ func init() {
 	catdog_env.Prefix(Domain)
 
 	// 使用前缀获取系统环境变量
-	catdog_env.Get(&Home, "cfg_dir", "config_dir", "home_dir", "home", "project_dir", "dir")
-	catdog_env.Get(&Project, "project_name", "service_name", "server_name", "project", "name")
+	catdog_env.Get(&Home, "home", "dir")
+	catdog_env.Get(&Project, "project", "name")
+	catdog_env.Get(&Mode, "mode", "run")
 
-	// 加载env source
+	CfgPath = filepath.Join(Home, "config", "config.yaml")
+	if !catdog_util.PathExist(Home) {
+		xerror.Exit(xerror.Fmt("home path %s not exists", Home))
+	}
+	if !catdog_util.PathExist(CfgPath) {
+		xerror.Exit(xerror.Fmt("config path %s not exists", CfgPath))
+	}
+
 	cfg = &Config{Config: xerror.ExitErr(memory.NewConfig()).(config.Config)}
-	xerror.Exit(cfg.Init(config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain)))))
-}
+	xerror.Exit(cfg.Init(
+		// 加载env source
+		config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain))),
+		// 加载file source
+		config.WithSource(mFile.NewSource(
+			mFile.WithPath(filepath.Join(Home, "config", "config.yaml")),
+			source.WithEncoder(yaml.NewEncoder()),
+		)),
+	))
 
-func init() {
+	// debug and trace
+	xerror.Exit(dix.WithAfterStart(func() {
+		if !Trace {
+			return
+		}
+
+		fmt.Println("config", string(LoadBytes()))
+		fmt.Println("deps", dix.Graph())
+	}))
+
+	// 运行环境检查
 	xerror.Exit(dix.WithBeforeStart(func() {
-		if Trace {
-			fmt.Println("config", string(LoadBytes()))
-			fmt.Println("deps", dix.Graph())
+		var m = RunMode
+		switch Mode {
+		case m.Dev, m.Stag, m.Prod, m.Test, m.Release:
+		default:
+			xerror.Exit(xerror.Fmt("running mode does not match, mode: %s", Mode))
 		}
 	}))
 }

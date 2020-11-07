@@ -1,11 +1,12 @@
 package catdog_handler
 
 import (
+	"reflect"
+
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/catdog/catdog_data"
-	"github.com/pubgo/catdog/catdog_server"
+	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/xerror"
-	"reflect"
 )
 
 type Handler struct {

@@ -3,7 +3,7 @@ package rabbitmq
 import (
 	"context"
 	"github.com/pubgo/catdog/internal/tracing"
-	"github.com/pubgo/catdog/plugins/catdog_rabbitmq_plugin"
+	"github.com/pubgo/catdog/plugins/catdog_rabbitmq"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -19,19 +19,19 @@ const (
 	DeliveryModePersistent = 2
 
 	// import from watcher package
-	ExchangeKindDirect = catdog_rabbitmq_plugin.ExchangeKindDirect
+	ExchangeKindDirect = catdog_rabbitmq.ExchangeKindDirect
 
 	prefetchCount = 200
 )
 
 type RabbitChanWithContext struct {
-	rabbitChan *catdog_rabbitmq_plugin.RabbitChan
+	rabbitChan *catdog_rabbitmq.RabbitChan
 	ctx        context.Context
 }
 
 // Caution!!! This function return a channel, you should close it after use.
 func GetRbmqClient(ctx context.Context, prefix string) (*RabbitChanWithContext, error) {
-	rabbitmqChan, err := catdog_rabbitmq_plugin.PickupRabiitMQClient(prefix)
+	rabbitmqChan, err := catdog_rabbitmq.PickupRabiitMQClient(prefix)
 	if err != nil || rabbitmqChan == nil {
 		return nil, err
 	}

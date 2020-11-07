@@ -22,8 +22,9 @@ type Entry interface {
 
 type Option func(o *Options)
 type Options struct {
-	Name       string
-	Version    string
-	RunCommand *cobra.Command
-	Command    *cobra.Command
+	Name        string
+	Description string
+	Version     string
+	RunCommand  *cobra.Command
+	Command     *cobra.Command
 }

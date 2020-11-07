@@ -19,12 +19,12 @@ func NewLogger() *logger {
 }
 
 func (l *logger) Error(msg string) {
-	xlog.ErrorF("ERROR: %s", msg)
+	xlog.Errorf("ERROR: %s", msg)
 }
 
 // Infof logs a message at info priority
 func (l *logger) Infof(msg string, args ...interface{}) {
-	xlog.InfoF(msg, args...)
+	xlog.Infof(msg, args...)
 }
 
 func (l *logger) Write(b []byte) (n int, err error) {

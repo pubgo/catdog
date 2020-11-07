@@ -13,22 +13,22 @@ func Prefix(p string) {
 	prefix = p
 }
 
-func Set(key, value string) error {
+func withPrefix(key string) string {
 	if prefix != "" {
 		key = prefix + "_" + key
 	}
+	return key
+}
 
+func Set(key, value string) error {
+	key = withPrefix(key)
 	return xerror.Wrap(os.Setenv(strings.ToUpper(key), value))
 }
 
 func Get(val *string, names ...string) {
 	for _, name := range names {
-		nm := name
-		if prefix != "" {
-			nm = prefix + "_" + nm
-		}
-
-		env, ok := os.LookupEnv(strings.ToUpper(nm))
+		name = withPrefix(name)
+		env, ok := os.LookupEnv(strings.ToUpper(name))
 		env = strings.TrimSpace(env)
 		if ok && env != "" {
 			*val = env
@@ -41,12 +41,7 @@ func Get(val *string, names ...string) {
 // of the current environment variables. References to undefined
 // variables are replaced by the empty string.
 func Expand(data string) string {
-	return os.Expand(data, func(s string) string {
-		if prefix != "" {
-			return prefix + "_" + s
-		}
-		return s
-	})
+	return os.Expand(data, func(s string) string { return withPrefix(s) })
 }
 
 func Clear() {
@@ -54,17 +49,11 @@ func Clear() {
 }
 
 func Lookup(key string) (string, bool) {
-	if prefix != "" {
-		key = prefix + "_" + key
-	}
-
+	key = withPrefix(key)
 	return os.LookupEnv(key)
 }
 
 func Unsetenv(key string) error {
-	if prefix != "" {
-		key = prefix + "_" + key
-	}
-
+	key = withPrefix(key)
 	return os.Unsetenv(key)
 }
