@@ -7,6 +7,7 @@ replace google.golang.org/grpc => google.golang.org/grpc v1.29.0
 require (
 	github.com/apache/thrift v0.13.0
 	github.com/asim/nitro-plugins/client/grpc/v3 v3.3.1-0.20201031120104-4c96a26220fa
+	github.com/asim/nitro-plugins/config/source/etcd/v3 v3.4.0
 	github.com/asim/nitro-plugins/registry/mdns v0.0.0-20201101073154-04271fcbbf50
 	github.com/asim/nitro-plugins/server/grpc/v3 v3.3.1-0.20201031120104-4c96a26220fa
 	github.com/asim/nitro/v3 v3.3.0
@@ -33,7 +34,7 @@ require (
 	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
 	go.mongodb.org/mongo-driver v1.3.2
-	go.uber.org/zap v1.15.0
+	go.uber.org/zap v1.16.0
 	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154
 	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0

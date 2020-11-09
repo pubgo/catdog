@@ -1,9 +1,8 @@
-package redis
+package catdog_redis
 
 import (
 	"context"
-	"github.com/pubgo/catdog/internal/tracing"
-	"github.com/pubgo/catdog/plugins/catdog_redis"
+	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 	"strings"
 	"time"
 
@@ -37,7 +36,7 @@ func WithWriteTimeout(d time.Duration) Option {
 
 // GetRedis get a redis client with open tracing context
 func GetRedis(ctx context.Context, prefix string, options ...Option) (*redis.Client, error) {
-	client, err := catdog_redis.PickupRedisClient(prefix)
+	client, err := PickupRedisClient(prefix)
 	if err != nil {
 		return nil, err
 	}

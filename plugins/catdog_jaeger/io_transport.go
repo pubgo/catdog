@@ -1,4 +1,4 @@
-package transport
+package catdog_jaeger
 
 import (
 	"bytes"

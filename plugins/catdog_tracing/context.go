@@ -3,7 +3,7 @@ package catdog_tracing
 import (
 	"context"
 
-	"github.com/pubgo/catdog/internal/tracing"
+	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 )
 
 // NewContextWithOld 为请求生成不依赖于父一级服务超时设置的请求

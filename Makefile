@@ -64,6 +64,15 @@ proto: clear gen
    --catdog_out=. \
 	example/proto/login/*
 
+	protoc -I. \
+   -I/usr/local/include \
+   -I${GOPATH}/src \
+   -I${GOPATH}/src/github.com/googleapis/googleapis \
+   -I${GOPATH}/src/github.com/gogo/protobuf \
+   --go_out=. \
+   --catdog_out=. \
+	plugins/catdog_debug/proto/*
+
 .PHONY: clear
 clear:
 	rm -rf example/proto/*.go

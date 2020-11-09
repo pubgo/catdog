@@ -8,7 +8,7 @@ import (
 	"github.com/asim/nitro/v3/server"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
-	"github.com/pubgo/catdog/internal/tracing"
+	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 )
 
 // HandlerWrap is a handler wrapper, look at micro's handler wrapper option

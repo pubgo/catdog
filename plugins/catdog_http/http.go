@@ -1,11 +1,10 @@
-package http
+package catdog_http
 
 import (
 	"context"
-	"github.com/pubgo/catdog/internal/tracing"
+	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 	"net/http"
 	"time"
-
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"

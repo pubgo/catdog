@@ -11,7 +11,7 @@ import (
 	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/catdog/catdog_app"
-	"github.com/pubgo/catdog/internal/tracing"
+	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 )
 
 func (p *Plugin) handlerWrap() error {

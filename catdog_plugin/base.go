@@ -7,36 +7,54 @@ import (
 	"github.com/spf13/pflag"
 )
 
-var _ Plugin = (*basePlugin)(nil)
+var _ Plugin = (*Base)(nil)
 
-type basePlugin struct {
-	name string
+type Base struct {
+	Name       string
+	OnInit     func()
+	OnWatch    func(r reader.Value) error
+	OnCommands func(cmd *cobra.Command)
+	OnHandler  func() *catdog_handler.Handler
+	OnFlags    func(flags *pflag.FlagSet)
 }
 
-func (p *basePlugin) Init() error {
+func (p *Base) Init() {
+	if p.OnInit != nil {
+		p.OnInit()
+	}
+}
+
+func (p *Base) Watch(r reader.Value) error {
+	if p.OnWatch != nil {
+		return p.OnWatch(r)
+	}
 	return nil
 }
 
-func (p *basePlugin) Watch(r reader.Value) error {
+func (p *Base) Commands() *cobra.Command {
+	if p.OnCommands != nil {
+		cmd := &cobra.Command{Use: p.Name}
+		p.OnCommands(cmd)
+		return cmd
+	}
 	return nil
 }
 
-func (p *basePlugin) Commands() *cobra.Command {
+func (p *Base) Handler() *catdog_handler.Handler {
+	if p.OnHandler != nil {
+		return p.OnHandler()
+	}
 	return nil
 }
 
-func (p *basePlugin) Handler() *catdog_handler.Handler {
-	return nil
+func (p *Base) String() string {
+	return p.Name
 }
 
-func (p *basePlugin) String() string {
-	return p.name
-}
-
-func (p *basePlugin) Flags() *pflag.FlagSet {
-	return nil
-}
-
-func NewBase(name string) Plugin {
-	return &basePlugin{name: name}
+func (p *Base) Flags() *pflag.FlagSet {
+	flags := pflag.NewFlagSet(p.Name, pflag.PanicOnError)
+	if p.OnFlags != nil {
+		p.OnFlags(flags)
+	}
+	return flags
 }

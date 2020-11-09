@@ -1,5 +1,5 @@
 // Package handler implements catdog_service catdog_debug_plugin handler embedded in nitro services
-package handler
+package catdog_debug
 
 import (
 	"context"

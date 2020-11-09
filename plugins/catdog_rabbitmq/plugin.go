@@ -34,7 +34,7 @@ func (p *Plugin) Flags() *pflag.FlagSet {
 
 func NewPlugin() *Plugin {
 	return &Plugin{
-		Plugin: catdog_plugin.New("rabbitMQ"),
+		Plugin: catdog_plugin.New("rabbit"),
 		log:    catdog_log.GetLog().Named("catdog.plugin.rabbitMQ"),
 	}
 }
