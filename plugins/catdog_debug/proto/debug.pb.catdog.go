@@ -51,7 +51,7 @@ func NewDebugService(name string, c client.Client) DebugService {
 		name: name,
 	}
 }
-func (c *DebugService) Log(ctx context.Context, in *LogRequest, opts ...client.CallOption) (*LogResponse, error) {
+func (c *debugService) Log(ctx context.Context, in *LogRequest, opts ...client.CallOption) (*LogResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Debug.Log", in)
 	out := new(LogResponse)
@@ -89,11 +89,7 @@ func (x *DebugLog) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *DebugLog) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *DebugService) Health(ctx context.Context, in *HealthRequest, opts ...client.CallOption) (*HealthResponse, error) {
+func (c *debugService) Health(ctx context.Context, in *HealthRequest, opts ...client.CallOption) (*HealthResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Debug.Health", in)
 	out := new(HealthResponse)
@@ -131,11 +127,7 @@ func (x *DebugHealth) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *DebugHealth) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *DebugService) Stats(ctx context.Context, in *StatsRequest, opts ...client.CallOption) (*StatsResponse, error) {
+func (c *debugService) Stats(ctx context.Context, in *StatsRequest, opts ...client.CallOption) (*StatsResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Debug.Stats", in)
 	out := new(StatsResponse)
@@ -173,11 +165,7 @@ func (x *DebugStats) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *DebugStats) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *DebugService) Trace(ctx context.Context, in *TraceRequest, opts ...client.CallOption) (*TraceResponse, error) {
+func (c *debugService) Trace(ctx context.Context, in *TraceRequest, opts ...client.CallOption) (*TraceResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Debug.Trace", in)
 	out := new(TraceResponse)
@@ -215,10 +203,6 @@ func (x *DebugTrace) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *DebugTrace) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
 // Server API for Debug service
 type DebugHandler interface {
 	Log(context.Context, *LogRequest, *LogResponse) error
@@ -252,166 +236,18 @@ type debugHandler struct {
 	DebugHandler
 }
 
-func (h *DebugHandler) Log(ctx context.Context, in *LogRequest, out *LogResponse) error {
+func (h *debugHandler) Log(ctx context.Context, in *LogRequest, out *LogResponse) error {
 	return h.DebugHandler.Log(ctx, in, out)
 }
 
-func (h *DebugHandler) Log(ctx context.Context, stream server.Stream) error {
-
-	m := new(LogRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.DebugHandler.Log(ctx, m, &debugLogStream{stream})
-
-}
-
-type Debug_LogStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type debugLogStream struct {
-	stream server.Stream
-}
-
-func (x *debugLogStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *debugLogStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *debugLogStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *debugLogStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *DebugHandler) Health(ctx context.Context, in *HealthRequest, out *HealthResponse) error {
+func (h *debugHandler) Health(ctx context.Context, in *HealthRequest, out *HealthResponse) error {
 	return h.DebugHandler.Health(ctx, in, out)
 }
 
-func (h *DebugHandler) Health(ctx context.Context, stream server.Stream) error {
-
-	m := new(HealthRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.DebugHandler.Health(ctx, m, &debugHealthStream{stream})
-
-}
-
-type Debug_HealthStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type debugHealthStream struct {
-	stream server.Stream
-}
-
-func (x *debugHealthStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *debugHealthStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *debugHealthStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *debugHealthStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *DebugHandler) Stats(ctx context.Context, in *StatsRequest, out *StatsResponse) error {
+func (h *debugHandler) Stats(ctx context.Context, in *StatsRequest, out *StatsResponse) error {
 	return h.DebugHandler.Stats(ctx, in, out)
 }
 
-func (h *DebugHandler) Stats(ctx context.Context, stream server.Stream) error {
-
-	m := new(StatsRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.DebugHandler.Stats(ctx, m, &debugStatsStream{stream})
-
-}
-
-type Debug_StatsStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type debugStatsStream struct {
-	stream server.Stream
-}
-
-func (x *debugStatsStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *debugStatsStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *debugStatsStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *debugStatsStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *DebugHandler) Trace(ctx context.Context, in *TraceRequest, out *TraceResponse) error {
+func (h *debugHandler) Trace(ctx context.Context, in *TraceRequest, out *TraceResponse) error {
 	return h.DebugHandler.Trace(ctx, in, out)
-}
-
-func (h *DebugHandler) Trace(ctx context.Context, stream server.Stream) error {
-
-	m := new(TraceRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.DebugHandler.Trace(ctx, m, &debugTraceStream{stream})
-
-}
-
-type Debug_TraceStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type debugTraceStream struct {
-	stream server.Stream
-}
-
-func (x *debugTraceStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *debugTraceStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *debugTraceStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *debugTraceStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
 }

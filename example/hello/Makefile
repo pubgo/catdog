@@ -1,21 +1,23 @@
 GOPATH:=$(shell go env GOPATH)
 
-.PHONY: proto
-proto:
+.PHONY: proto clear
+proto: clear
 	protoc -I. \
  		   -I/usr/local/include \
            -I${GOPATH}/src \
            -I${GOPATH}/src/github.com/googleapis/googleapis \
            -I${GOPATH}/src/github.com/pubgo/catdog/example/hello/proto \
            --proto_path=${GOPATH}/src:. \
-           --go-micro_out=. \
+           --catdog_out=. \
            --go_out=. \
-           --grpc-gateway_out=. \
            proto/*
 
-.PHONY: build
-build: proto
-	go build -o helloworld *.go
+.PHONY: run build
+run: proto
+	go run cmd/main.go
+
+build:
+	go build -o main cmd/main.go
 
 .PHONY: test
 test:
@@ -24,3 +26,7 @@ test:
 .PHONY: docker
 docker:
 	docker build . -t helloworld:latest
+
+clear:
+	rm -rf proto/*.go
+	rm -rf proto/**/*.go

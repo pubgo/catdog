@@ -5,7 +5,6 @@ import (
 
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/catdog/catdog_data"
-	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/xerror"
 )
 
@@ -21,11 +20,14 @@ func New(hdlr interface{}, opts ...server.HandlerOption) *Handler {
 	}
 }
 
-func Register(hdlr interface{}, opts ...server.HandlerOption) (err error) {
+func Register(s server.Server, hdlr interface{}, opts ...server.HandlerOption) (err error) {
 	defer xerror.RespErr(&err)
 
 	if hdlr == nil {
-		return xerror.New("params should not be nil")
+		return xerror.New("[params] should not be nil")
+	}
+	if s == nil {
+		return xerror.New("[server] should not be nil")
 	}
 
 	var vRegister reflect.Value
@@ -57,10 +59,7 @@ func Register(hdlr interface{}, opts ...server.HandlerOption) (err error) {
 		return xerror.Fmt("the second parameter type does not match")
 	}
 
-	var sOpts = []reflect.Value{
-		reflect.ValueOf(catdog_server.Default),
-		vHandler,
-	}
+	var sOpts = []reflect.Value{reflect.ValueOf(s), vHandler}
 	for _, opt := range opts {
 		sOpts = append(sOpts, reflect.ValueOf(opt))
 	}

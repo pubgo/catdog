@@ -15,7 +15,7 @@ func Start(ent catdog_entry.Entry) (err error) {
 	// 启动配置, 初始化组件
 	entPlugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))
 	for _, pl := range append(catdog_plugin.List(), entPlugins...) {
-		xerror.Exit(pl.Init())
+		xerror.Panic(pl.Init())
 		hdlr := pl.Handler()
 		if hdlr != nil {
 			xerror.Panic(ent.Handler(hdlr, hdlr.Opts...))

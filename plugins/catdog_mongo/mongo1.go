@@ -52,7 +52,7 @@ func injectMonitor(prefix string) error {
 	opts.SetServerSelectionTimeout(default_timeout)
 
 	if err := RefreshClient(prefix, opts); err != nil {
-		xlog.ErrorF("Tracing.catdog_mongo_plugin refresh error:%s", err)
+		xlog.Errorf("Tracing.catdog_mongo_plugin refresh error:%s", err)
 		return err
 	}
 	return nil

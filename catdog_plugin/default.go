@@ -2,9 +2,10 @@ package catdog_plugin
 
 import (
 	"fmt"
+	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/xlog"
 
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 )
 
@@ -41,9 +42,10 @@ func Of(pl ...Plugin) []Plugin {
 }
 
 func init() {
-	xerror.Exit(dix.WithAfterStart(func() {
+	xerror.Exit(catdog_abc.WithAfterStart(func() {
 		if catdog_config.Trace {
-			fmt.Println("plugins", String())
+			xlog.Debug("plugins trace")
+			fmt.Println(String())
 		}
 	}))
 }

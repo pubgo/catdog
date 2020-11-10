@@ -2,14 +2,13 @@ package catdog_http
 
 import (
 	"context"
-	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 	"net/http"
 	"time"
 
+	"github.com/gojektech/heimdall/hystrix"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
-
-	"github.com/gojektech/heimdall/hystrix"
+	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 )
 
 const (

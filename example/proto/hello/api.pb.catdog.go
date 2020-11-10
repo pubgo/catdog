@@ -49,7 +49,7 @@ func NewTestApiService(name string, c client.Client) TestApiService {
 		name: name,
 	}
 }
-func (c *TestApiService) Version(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
+func (c *testApiService) Version(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
 
 	req := c.c.NewRequest(c.name, "TestApi.Version", in)
 	out := new(TestApiOutput)
@@ -87,11 +87,7 @@ func (x *TestApiVersion) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *TestApiVersion) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *TestApiService) VersionTest(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
+func (c *testApiService) VersionTest(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
 
 	req := c.c.NewRequest(c.name, "TestApi.VersionTest", in)
 	out := new(TestApiOutput)
@@ -129,10 +125,6 @@ func (x *TestApiVersionTest) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *TestApiVersionTest) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
 // Server API for TestApi service
 type TestApiHandler interface {
 	Version(context.Context, *TestReq, *TestApiOutput) error
@@ -160,86 +152,12 @@ type testApiHandler struct {
 	TestApiHandler
 }
 
-func (h *TestApiHandler) Version(ctx context.Context, in *TestReq, out *TestApiOutput) error {
+func (h *testApiHandler) Version(ctx context.Context, in *TestReq, out *TestApiOutput) error {
 	return h.TestApiHandler.Version(ctx, in, out)
 }
 
-func (h *TestApiHandler) Version(ctx context.Context, stream server.Stream) error {
-
-	m := new(TestReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.TestApiHandler.Version(ctx, m, &testApiVersionStream{stream})
-
-}
-
-type TestApi_VersionStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type testApiVersionStream struct {
-	stream server.Stream
-}
-
-func (x *testApiVersionStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *testApiVersionStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *testApiVersionStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *testApiVersionStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *TestApiHandler) VersionTest(ctx context.Context, in *TestReq, out *TestApiOutput) error {
+func (h *testApiHandler) VersionTest(ctx context.Context, in *TestReq, out *TestApiOutput) error {
 	return h.TestApiHandler.VersionTest(ctx, in, out)
-}
-
-func (h *TestApiHandler) VersionTest(ctx context.Context, stream server.Stream) error {
-
-	m := new(TestReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.TestApiHandler.VersionTest(ctx, m, &testApiVersionTestStream{stream})
-
-}
-
-type TestApi_VersionTestStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type testApiVersionTestStream struct {
-	stream server.Stream
-}
-
-func (x *testApiVersionTestStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *testApiVersionTestStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *testApiVersionTestStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *testApiVersionTestStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
 }
 
 // Client API for TestApiV2 service
@@ -259,7 +177,7 @@ func NewTestApiV2Service(name string, c client.Client) TestApiV2Service {
 		name: name,
 	}
 }
-func (c *TestApiV2Service) Version(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
+func (c *testApiV2Service) Version(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
 
 	req := c.c.NewRequest(c.name, "TestApiV2.Version", in)
 	out := new(TestApiOutput)
@@ -297,11 +215,7 @@ func (x *TestApiV2Version) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *TestApiV2Version) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *TestApiV2Service) VersionTest(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
+func (c *testApiV2Service) VersionTest(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
 
 	req := c.c.NewRequest(c.name, "TestApiV2.VersionTest", in)
 	out := new(TestApiOutput)
@@ -339,10 +253,6 @@ func (x *TestApiV2VersionTest) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *TestApiV2VersionTest) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
 // Server API for TestApiV2 service
 type TestApiV2Handler interface {
 	Version(context.Context, *TestReq, *TestApiOutput) error
@@ -370,84 +280,10 @@ type testApiV2Handler struct {
 	TestApiV2Handler
 }
 
-func (h *TestApiV2Handler) Version(ctx context.Context, in *TestReq, out *TestApiOutput) error {
+func (h *testApiV2Handler) Version(ctx context.Context, in *TestReq, out *TestApiOutput) error {
 	return h.TestApiV2Handler.Version(ctx, in, out)
 }
 
-func (h *TestApiV2Handler) Version(ctx context.Context, stream server.Stream) error {
-
-	m := new(TestReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.TestApiV2Handler.Version(ctx, m, &testApiV2VersionStream{stream})
-
-}
-
-type TestApiV2_VersionStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type testApiV2VersionStream struct {
-	stream server.Stream
-}
-
-func (x *testApiV2VersionStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *testApiV2VersionStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *testApiV2VersionStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *testApiV2VersionStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *TestApiV2Handler) VersionTest(ctx context.Context, in *TestReq, out *TestApiOutput) error {
+func (h *testApiV2Handler) VersionTest(ctx context.Context, in *TestReq, out *TestApiOutput) error {
 	return h.TestApiV2Handler.VersionTest(ctx, in, out)
-}
-
-func (h *TestApiV2Handler) VersionTest(ctx context.Context, stream server.Stream) error {
-
-	m := new(TestReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.TestApiV2Handler.VersionTest(ctx, m, &testApiV2VersionTestStream{stream})
-
-}
-
-type TestApiV2_VersionTestStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type testApiV2VersionTestStream struct {
-	stream server.Stream
-}
-
-func (x *testApiV2VersionTestStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *testApiV2VersionTestStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *testApiV2VersionTestStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *testApiV2VersionTestStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
 }

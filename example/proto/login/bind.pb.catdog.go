@@ -53,7 +53,7 @@ func NewBindTelephoneService(name string, c client.Client) BindTelephoneService 
 		name: name,
 	}
 }
-func (c *BindTelephoneService) Check(ctx context.Context, in *CheckRequest, opts ...client.CallOption) (*CheckResponse, error) {
+func (c *bindTelephoneService) Check(ctx context.Context, in *CheckRequest, opts ...client.CallOption) (*CheckResponse, error) {
 
 	req := c.c.NewRequest(c.name, "BindTelephone.Check", in)
 	out := new(CheckResponse)
@@ -91,11 +91,7 @@ func (x *BindTelephoneCheck) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *BindTelephoneCheck) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *BindTelephoneService) BindVerify(ctx context.Context, in *BindVerifyRequest, opts ...client.CallOption) (*BindVerifyResponse, error) {
+func (c *bindTelephoneService) BindVerify(ctx context.Context, in *BindVerifyRequest, opts ...client.CallOption) (*BindVerifyResponse, error) {
 
 	req := c.c.NewRequest(c.name, "BindTelephone.BindVerify", in)
 	out := new(BindVerifyResponse)
@@ -133,11 +129,7 @@ func (x *BindTelephoneBindVerify) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *BindTelephoneBindVerify) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *BindTelephoneService) BindChange(ctx context.Context, in *BindChangeRequest, opts ...client.CallOption) (*BindChangeResponse, error) {
+func (c *bindTelephoneService) BindChange(ctx context.Context, in *BindChangeRequest, opts ...client.CallOption) (*BindChangeResponse, error) {
 
 	req := c.c.NewRequest(c.name, "BindTelephone.BindChange", in)
 	out := new(BindChangeResponse)
@@ -175,11 +167,7 @@ func (x *BindTelephoneBindChange) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *BindTelephoneBindChange) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *BindTelephoneService) AutomaticBind(ctx context.Context, in *AutomaticBindRequest, opts ...client.CallOption) (*AutomaticBindResponse, error) {
+func (c *bindTelephoneService) AutomaticBind(ctx context.Context, in *AutomaticBindRequest, opts ...client.CallOption) (*AutomaticBindResponse, error) {
 
 	req := c.c.NewRequest(c.name, "BindTelephone.AutomaticBind", in)
 	out := new(AutomaticBindResponse)
@@ -217,11 +205,7 @@ func (x *BindTelephoneAutomaticBind) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *BindTelephoneAutomaticBind) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *BindTelephoneService) BindPhoneParse(ctx context.Context, in *BindPhoneParseRequest, opts ...client.CallOption) (*BindPhoneParseResponse, error) {
+func (c *bindTelephoneService) BindPhoneParse(ctx context.Context, in *BindPhoneParseRequest, opts ...client.CallOption) (*BindPhoneParseResponse, error) {
 
 	req := c.c.NewRequest(c.name, "BindTelephone.BindPhoneParse", in)
 	out := new(BindPhoneParseResponse)
@@ -259,11 +243,7 @@ func (x *BindTelephoneBindPhoneParse) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *BindTelephoneBindPhoneParse) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *BindTelephoneService) BindPhoneParseByOneClick(ctx context.Context, in *BindPhoneParseByOneClickRequest, opts ...client.CallOption) (*BindPhoneParseByOneClickResponse, error) {
+func (c *bindTelephoneService) BindPhoneParseByOneClick(ctx context.Context, in *BindPhoneParseByOneClickRequest, opts ...client.CallOption) (*BindPhoneParseByOneClickResponse, error) {
 
 	req := c.c.NewRequest(c.name, "BindTelephone.BindPhoneParseByOneClick", in)
 	out := new(BindPhoneParseByOneClickResponse)
@@ -299,10 +279,6 @@ func (x *BindTelephoneBindPhoneParseByOneClick) SendMsg(m interface{}) error {
 
 func (x *BindTelephoneBindPhoneParseByOneClick) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
-}
-
-func (x *BindTelephoneBindPhoneParseByOneClick) Send(m *Message) error {
-	return x.stream.Send(m)
 }
 
 // Server API for BindTelephone service
@@ -344,248 +320,26 @@ type bindTelephoneHandler struct {
 	BindTelephoneHandler
 }
 
-func (h *BindTelephoneHandler) Check(ctx context.Context, in *CheckRequest, out *CheckResponse) error {
+func (h *bindTelephoneHandler) Check(ctx context.Context, in *CheckRequest, out *CheckResponse) error {
 	return h.BindTelephoneHandler.Check(ctx, in, out)
 }
 
-func (h *BindTelephoneHandler) Check(ctx context.Context, stream server.Stream) error {
-
-	m := new(CheckRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.BindTelephoneHandler.Check(ctx, m, &bindTelephoneCheckStream{stream})
-
-}
-
-type BindTelephone_CheckStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type bindTelephoneCheckStream struct {
-	stream server.Stream
-}
-
-func (x *bindTelephoneCheckStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *bindTelephoneCheckStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *bindTelephoneCheckStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *bindTelephoneCheckStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *BindTelephoneHandler) BindVerify(ctx context.Context, in *BindVerifyRequest, out *BindVerifyResponse) error {
+func (h *bindTelephoneHandler) BindVerify(ctx context.Context, in *BindVerifyRequest, out *BindVerifyResponse) error {
 	return h.BindTelephoneHandler.BindVerify(ctx, in, out)
 }
 
-func (h *BindTelephoneHandler) BindVerify(ctx context.Context, stream server.Stream) error {
-
-	m := new(BindVerifyRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.BindTelephoneHandler.BindVerify(ctx, m, &bindTelephoneBindVerifyStream{stream})
-
-}
-
-type BindTelephone_BindVerifyStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type bindTelephoneBindVerifyStream struct {
-	stream server.Stream
-}
-
-func (x *bindTelephoneBindVerifyStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *bindTelephoneBindVerifyStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *bindTelephoneBindVerifyStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *bindTelephoneBindVerifyStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *BindTelephoneHandler) BindChange(ctx context.Context, in *BindChangeRequest, out *BindChangeResponse) error {
+func (h *bindTelephoneHandler) BindChange(ctx context.Context, in *BindChangeRequest, out *BindChangeResponse) error {
 	return h.BindTelephoneHandler.BindChange(ctx, in, out)
 }
 
-func (h *BindTelephoneHandler) BindChange(ctx context.Context, stream server.Stream) error {
-
-	m := new(BindChangeRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.BindTelephoneHandler.BindChange(ctx, m, &bindTelephoneBindChangeStream{stream})
-
-}
-
-type BindTelephone_BindChangeStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type bindTelephoneBindChangeStream struct {
-	stream server.Stream
-}
-
-func (x *bindTelephoneBindChangeStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *bindTelephoneBindChangeStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *bindTelephoneBindChangeStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *bindTelephoneBindChangeStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *BindTelephoneHandler) AutomaticBind(ctx context.Context, in *AutomaticBindRequest, out *AutomaticBindResponse) error {
+func (h *bindTelephoneHandler) AutomaticBind(ctx context.Context, in *AutomaticBindRequest, out *AutomaticBindResponse) error {
 	return h.BindTelephoneHandler.AutomaticBind(ctx, in, out)
 }
 
-func (h *BindTelephoneHandler) AutomaticBind(ctx context.Context, stream server.Stream) error {
-
-	m := new(AutomaticBindRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.BindTelephoneHandler.AutomaticBind(ctx, m, &bindTelephoneAutomaticBindStream{stream})
-
-}
-
-type BindTelephone_AutomaticBindStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type bindTelephoneAutomaticBindStream struct {
-	stream server.Stream
-}
-
-func (x *bindTelephoneAutomaticBindStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *bindTelephoneAutomaticBindStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *bindTelephoneAutomaticBindStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *bindTelephoneAutomaticBindStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *BindTelephoneHandler) BindPhoneParse(ctx context.Context, in *BindPhoneParseRequest, out *BindPhoneParseResponse) error {
+func (h *bindTelephoneHandler) BindPhoneParse(ctx context.Context, in *BindPhoneParseRequest, out *BindPhoneParseResponse) error {
 	return h.BindTelephoneHandler.BindPhoneParse(ctx, in, out)
 }
 
-func (h *BindTelephoneHandler) BindPhoneParse(ctx context.Context, stream server.Stream) error {
-
-	m := new(BindPhoneParseRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.BindTelephoneHandler.BindPhoneParse(ctx, m, &bindTelephoneBindPhoneParseStream{stream})
-
-}
-
-type BindTelephone_BindPhoneParseStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type bindTelephoneBindPhoneParseStream struct {
-	stream server.Stream
-}
-
-func (x *bindTelephoneBindPhoneParseStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *bindTelephoneBindPhoneParseStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *bindTelephoneBindPhoneParseStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *bindTelephoneBindPhoneParseStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *BindTelephoneHandler) BindPhoneParseByOneClick(ctx context.Context, in *BindPhoneParseByOneClickRequest, out *BindPhoneParseByOneClickResponse) error {
+func (h *bindTelephoneHandler) BindPhoneParseByOneClick(ctx context.Context, in *BindPhoneParseByOneClickRequest, out *BindPhoneParseByOneClickResponse) error {
 	return h.BindTelephoneHandler.BindPhoneParseByOneClick(ctx, in, out)
-}
-
-func (h *BindTelephoneHandler) BindPhoneParseByOneClick(ctx context.Context, stream server.Stream) error {
-
-	m := new(BindPhoneParseByOneClickRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.BindTelephoneHandler.BindPhoneParseByOneClick(ctx, m, &bindTelephoneBindPhoneParseByOneClickStream{stream})
-
-}
-
-type BindTelephone_BindPhoneParseByOneClickStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type bindTelephoneBindPhoneParseByOneClickStream struct {
-	stream server.Stream
-}
-
-func (x *bindTelephoneBindPhoneParseByOneClickStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *bindTelephoneBindPhoneParseByOneClickStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *bindTelephoneBindPhoneParseByOneClickStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *bindTelephoneBindPhoneParseByOneClickStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
 }

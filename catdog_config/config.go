@@ -9,21 +9,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func DefaultFlags() *pflag.FlagSet {
-	flags := pflag.NewFlagSet("app", pflag.PanicOnError)
-	flags.StringVarP(&Mode, "mode", "m", Mode, "running mode(dev|test|stag|prod|release)")
-	flags.StringVarP(&Home, "home", "c", Home, "project config home dir")
-	flags.BoolVarP(&Debug, "debug", "d", Debug, "enable debug")
-	flags.BoolVarP(&Trace, "trace", "t", Trace, "enable trace")
-	flags.BoolVarP(&IsBlock, "block", "b", IsBlock, "enable signal block")
-	flags.StringVarP(&Project, "project", "p", Project, "project name")
-	return flags
-}
-
-type Config struct {
-	config.Config
-}
-
 // 默认的全局配置
 var (
 	Domain  = "catdog"
@@ -50,6 +35,21 @@ var RunMode = struct {
 	Stag:    "stag",
 	Prod:    "prod",
 	Release: "release",
+}
+
+type Config struct {
+	config.Config
+}
+
+func DefaultFlags() *pflag.FlagSet {
+	flags := pflag.NewFlagSet("app", pflag.PanicOnError)
+	flags.StringVarP(&Mode, "mode", "m", Mode, "running mode(dev|test|stag|prod|release)")
+	flags.StringVarP(&Home, "home", "c", Home, "project config home dir")
+	flags.BoolVarP(&Debug, "debug", "d", Debug, "enable debug")
+	flags.BoolVarP(&Trace, "trace", "t", Trace, "enable trace")
+	flags.BoolVarP(&IsBlock, "block", "b", IsBlock, "enable signal block")
+	flags.StringVarP(&Project, "project", "p", Project, "project name")
+	return flags
 }
 
 func Init(opts ...config.Option) {

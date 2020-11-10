@@ -3,6 +3,7 @@ package catdog_plugin
 import (
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_handler"
+	"github.com/pubgo/xerror"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -12,21 +13,24 @@ var _ Plugin = (*Base)(nil)
 type Base struct {
 	Name       string
 	OnInit     func()
-	OnWatch    func(r reader.Value) error
+	OnWatch    func(r reader.Value)
 	OnCommands func(cmd *cobra.Command)
 	OnHandler  func() *catdog_handler.Handler
 	OnFlags    func(flags *pflag.FlagSet)
 }
 
-func (p *Base) Init() {
+func (p *Base) Init() (err error) {
+	defer xerror.RespErr(&err)
 	if p.OnInit != nil {
 		p.OnInit()
 	}
+	return nil
 }
 
-func (p *Base) Watch(r reader.Value) error {
+func (p *Base) Watch(r reader.Value) (err error) {
+	defer xerror.RespErr(&err)
 	if p.OnWatch != nil {
-		return p.OnWatch(r)
+		p.OnWatch(r)
 	}
 	return nil
 }

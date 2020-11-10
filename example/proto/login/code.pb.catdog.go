@@ -52,7 +52,7 @@ func NewCodeService(name string, c client.Client) CodeService {
 		name: name,
 	}
 }
-func (c *CodeService) SendCode(ctx context.Context, in *SendCodeRequest, opts ...client.CallOption) (*SendCodeResponse, error) {
+func (c *codeService) SendCode(ctx context.Context, in *SendCodeRequest, opts ...client.CallOption) (*SendCodeResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Code.SendCode", in)
 	out := new(SendCodeResponse)
@@ -90,11 +90,7 @@ func (x *CodeSendCode) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *CodeSendCode) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *CodeService) Verify(ctx context.Context, in *VerifyRequest, opts ...client.CallOption) (*VerifyResponse, error) {
+func (c *codeService) Verify(ctx context.Context, in *VerifyRequest, opts ...client.CallOption) (*VerifyResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Code.Verify", in)
 	out := new(VerifyResponse)
@@ -132,11 +128,7 @@ func (x *CodeVerify) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *CodeVerify) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *CodeService) IsCheckImageCode(ctx context.Context, in *IsCheckImageCodeRequest, opts ...client.CallOption) (*IsCheckImageCodeResponse, error) {
+func (c *codeService) IsCheckImageCode(ctx context.Context, in *IsCheckImageCodeRequest, opts ...client.CallOption) (*IsCheckImageCodeResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Code.IsCheckImageCode", in)
 	out := new(IsCheckImageCodeResponse)
@@ -174,11 +166,7 @@ func (x *CodeIsCheckImageCode) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *CodeIsCheckImageCode) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *CodeService) VerifyImageCode(ctx context.Context, in *VerifyImageCodeRequest, opts ...client.CallOption) (*VerifyImageCodeResponse, error) {
+func (c *codeService) VerifyImageCode(ctx context.Context, in *VerifyImageCodeRequest, opts ...client.CallOption) (*VerifyImageCodeResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Code.VerifyImageCode", in)
 	out := new(VerifyImageCodeResponse)
@@ -216,11 +204,7 @@ func (x *CodeVerifyImageCode) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *CodeVerifyImageCode) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *CodeService) GetSendStatus(ctx context.Context, in *GetSendStatusRequest, opts ...client.CallOption) (*GetSendStatusResponse, error) {
+func (c *codeService) GetSendStatus(ctx context.Context, in *GetSendStatusRequest, opts ...client.CallOption) (*GetSendStatusResponse, error) {
 
 	req := c.c.NewRequest(c.name, "Code.GetSendStatus", in)
 	out := new(GetSendStatusResponse)
@@ -256,10 +240,6 @@ func (x *CodeGetSendStatus) SendMsg(m interface{}) error {
 
 func (x *CodeGetSendStatus) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
-}
-
-func (x *CodeGetSendStatus) Send(m *Message) error {
-	return x.stream.Send(m)
 }
 
 // Server API for Code service
@@ -298,207 +278,22 @@ type codeHandler struct {
 	CodeHandler
 }
 
-func (h *CodeHandler) SendCode(ctx context.Context, in *SendCodeRequest, out *SendCodeResponse) error {
+func (h *codeHandler) SendCode(ctx context.Context, in *SendCodeRequest, out *SendCodeResponse) error {
 	return h.CodeHandler.SendCode(ctx, in, out)
 }
 
-func (h *CodeHandler) SendCode(ctx context.Context, stream server.Stream) error {
-
-	m := new(SendCodeRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.CodeHandler.SendCode(ctx, m, &codeSendCodeStream{stream})
-
-}
-
-type Code_SendCodeStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type codeSendCodeStream struct {
-	stream server.Stream
-}
-
-func (x *codeSendCodeStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *codeSendCodeStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *codeSendCodeStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *codeSendCodeStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *CodeHandler) Verify(ctx context.Context, in *VerifyRequest, out *VerifyResponse) error {
+func (h *codeHandler) Verify(ctx context.Context, in *VerifyRequest, out *VerifyResponse) error {
 	return h.CodeHandler.Verify(ctx, in, out)
 }
 
-func (h *CodeHandler) Verify(ctx context.Context, stream server.Stream) error {
-
-	m := new(VerifyRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.CodeHandler.Verify(ctx, m, &codeVerifyStream{stream})
-
-}
-
-type Code_VerifyStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type codeVerifyStream struct {
-	stream server.Stream
-}
-
-func (x *codeVerifyStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *codeVerifyStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *codeVerifyStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *codeVerifyStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *CodeHandler) IsCheckImageCode(ctx context.Context, in *IsCheckImageCodeRequest, out *IsCheckImageCodeResponse) error {
+func (h *codeHandler) IsCheckImageCode(ctx context.Context, in *IsCheckImageCodeRequest, out *IsCheckImageCodeResponse) error {
 	return h.CodeHandler.IsCheckImageCode(ctx, in, out)
 }
 
-func (h *CodeHandler) IsCheckImageCode(ctx context.Context, stream server.Stream) error {
-
-	m := new(IsCheckImageCodeRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.CodeHandler.IsCheckImageCode(ctx, m, &codeIsCheckImageCodeStream{stream})
-
-}
-
-type Code_IsCheckImageCodeStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type codeIsCheckImageCodeStream struct {
-	stream server.Stream
-}
-
-func (x *codeIsCheckImageCodeStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *codeIsCheckImageCodeStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *codeIsCheckImageCodeStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *codeIsCheckImageCodeStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *CodeHandler) VerifyImageCode(ctx context.Context, in *VerifyImageCodeRequest, out *VerifyImageCodeResponse) error {
+func (h *codeHandler) VerifyImageCode(ctx context.Context, in *VerifyImageCodeRequest, out *VerifyImageCodeResponse) error {
 	return h.CodeHandler.VerifyImageCode(ctx, in, out)
 }
 
-func (h *CodeHandler) VerifyImageCode(ctx context.Context, stream server.Stream) error {
-
-	m := new(VerifyImageCodeRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.CodeHandler.VerifyImageCode(ctx, m, &codeVerifyImageCodeStream{stream})
-
-}
-
-type Code_VerifyImageCodeStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type codeVerifyImageCodeStream struct {
-	stream server.Stream
-}
-
-func (x *codeVerifyImageCodeStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *codeVerifyImageCodeStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *codeVerifyImageCodeStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *codeVerifyImageCodeStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *CodeHandler) GetSendStatus(ctx context.Context, in *GetSendStatusRequest, out *GetSendStatusResponse) error {
+func (h *codeHandler) GetSendStatus(ctx context.Context, in *GetSendStatusRequest, out *GetSendStatusResponse) error {
 	return h.CodeHandler.GetSendStatus(ctx, in, out)
-}
-
-func (h *CodeHandler) GetSendStatus(ctx context.Context, stream server.Stream) error {
-
-	m := new(GetSendStatusRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.CodeHandler.GetSendStatus(ctx, m, &codeGetSendStatusStream{stream})
-
-}
-
-type Code_GetSendStatusStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type codeGetSendStatusStream struct {
-	stream server.Stream
-}
-
-func (x *codeGetSendStatusStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *codeGetSendStatusStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *codeGetSendStatusStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *codeGetSendStatusStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
 }

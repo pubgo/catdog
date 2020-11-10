@@ -12,6 +12,7 @@ require (
 	github.com/asim/nitro-plugins/server/grpc/v3 v3.3.1-0.20201031120104-4c96a26220fa
 	github.com/asim/nitro/v3 v3.3.0
 	github.com/dave/jennifer v1.4.0
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/gofiber/fiber v1.14.5
@@ -19,14 +20,14 @@ require (
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/golang/protobuf v1.4.3
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1 // indirect
 	github.com/hashicorp/go-version v1.2.1
 	github.com/imdario/mergo v0.3.9
 	github.com/jaegertracing/jaeger v1.19.2
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/pubgo/dix v0.1.0
 	github.com/pubgo/xerror v0.2.12
-	github.com/pubgo/xlog v0.0.9
+	github.com/pubgo/xlog v0.0.10
 	github.com/pubgo/xprocess v0.0.3
 	github.com/pubgo/xprotogen v0.0.2
 	github.com/spf13/cobra v1.1.1
@@ -36,7 +37,7 @@ require (
 	go.mongodb.org/mongo-driver v1.3.2
 	go.uber.org/zap v1.16.0
 	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154
-	google.golang.org/grpc v1.33.1
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/grpc v1.33.1 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
 	vitess.io/vitess v0.7.0
 )

@@ -52,7 +52,7 @@ func NewMergeService(name string, c client.Client) MergeService {
 		name: name,
 	}
 }
-func (c *MergeService) Telephone(ctx context.Context, in *TelephoneRequest, opts ...client.CallOption) (*Reply, error) {
+func (c *mergeService) Telephone(ctx context.Context, in *TelephoneRequest, opts ...client.CallOption) (*Reply, error) {
 
 	req := c.c.NewRequest(c.name, "Merge.Telephone", in)
 	out := new(Reply)
@@ -90,11 +90,7 @@ func (x *MergeTelephone) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *MergeTelephone) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *MergeService) TelephoneCheck(ctx context.Context, in *TelephoneRequest, opts ...client.CallOption) (*Reply, error) {
+func (c *mergeService) TelephoneCheck(ctx context.Context, in *TelephoneRequest, opts ...client.CallOption) (*Reply, error) {
 
 	req := c.c.NewRequest(c.name, "Merge.TelephoneCheck", in)
 	out := new(Reply)
@@ -132,11 +128,7 @@ func (x *MergeTelephoneCheck) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *MergeTelephoneCheck) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *MergeService) WeChat(ctx context.Context, in *WeChatRequest, opts ...client.CallOption) (*Reply, error) {
+func (c *mergeService) WeChat(ctx context.Context, in *WeChatRequest, opts ...client.CallOption) (*Reply, error) {
 
 	req := c.c.NewRequest(c.name, "Merge.WeChat", in)
 	out := new(Reply)
@@ -174,11 +166,7 @@ func (x *MergeWeChat) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *MergeWeChat) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *MergeService) WeChatCheck(ctx context.Context, in *WeChatRequest, opts ...client.CallOption) (*Reply, error) {
+func (c *mergeService) WeChatCheck(ctx context.Context, in *WeChatRequest, opts ...client.CallOption) (*Reply, error) {
 
 	req := c.c.NewRequest(c.name, "Merge.WeChatCheck", in)
 	out := new(Reply)
@@ -216,11 +204,7 @@ func (x *MergeWeChatCheck) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *MergeWeChatCheck) Send(m *Message) error {
-	return x.stream.Send(m)
-}
-
-func (c *MergeService) WeChatUnMerge(ctx context.Context, in *WeChatUnMergeRequest, opts ...client.CallOption) (*Reply, error) {
+func (c *mergeService) WeChatUnMerge(ctx context.Context, in *WeChatUnMergeRequest, opts ...client.CallOption) (*Reply, error) {
 
 	req := c.c.NewRequest(c.name, "Merge.WeChatUnMerge", in)
 	out := new(Reply)
@@ -256,10 +240,6 @@ func (x *MergeWeChatUnMerge) SendMsg(m interface{}) error {
 
 func (x *MergeWeChatUnMerge) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
-}
-
-func (x *MergeWeChatUnMerge) Send(m *Message) error {
-	return x.stream.Send(m)
 }
 
 // Server API for Merge service
@@ -298,207 +278,22 @@ type mergeHandler struct {
 	MergeHandler
 }
 
-func (h *MergeHandler) Telephone(ctx context.Context, in *TelephoneRequest, out *Reply) error {
+func (h *mergeHandler) Telephone(ctx context.Context, in *TelephoneRequest, out *Reply) error {
 	return h.MergeHandler.Telephone(ctx, in, out)
 }
 
-func (h *MergeHandler) Telephone(ctx context.Context, stream server.Stream) error {
-
-	m := new(TelephoneRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.MergeHandler.Telephone(ctx, m, &mergeTelephoneStream{stream})
-
-}
-
-type Merge_TelephoneStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type mergeTelephoneStream struct {
-	stream server.Stream
-}
-
-func (x *mergeTelephoneStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *mergeTelephoneStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *mergeTelephoneStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *mergeTelephoneStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *MergeHandler) TelephoneCheck(ctx context.Context, in *TelephoneRequest, out *Reply) error {
+func (h *mergeHandler) TelephoneCheck(ctx context.Context, in *TelephoneRequest, out *Reply) error {
 	return h.MergeHandler.TelephoneCheck(ctx, in, out)
 }
 
-func (h *MergeHandler) TelephoneCheck(ctx context.Context, stream server.Stream) error {
-
-	m := new(TelephoneRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.MergeHandler.TelephoneCheck(ctx, m, &mergeTelephoneCheckStream{stream})
-
-}
-
-type Merge_TelephoneCheckStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type mergeTelephoneCheckStream struct {
-	stream server.Stream
-}
-
-func (x *mergeTelephoneCheckStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *mergeTelephoneCheckStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *mergeTelephoneCheckStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *mergeTelephoneCheckStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *MergeHandler) WeChat(ctx context.Context, in *WeChatRequest, out *Reply) error {
+func (h *mergeHandler) WeChat(ctx context.Context, in *WeChatRequest, out *Reply) error {
 	return h.MergeHandler.WeChat(ctx, in, out)
 }
 
-func (h *MergeHandler) WeChat(ctx context.Context, stream server.Stream) error {
-
-	m := new(WeChatRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.MergeHandler.WeChat(ctx, m, &mergeWeChatStream{stream})
-
-}
-
-type Merge_WeChatStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type mergeWeChatStream struct {
-	stream server.Stream
-}
-
-func (x *mergeWeChatStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *mergeWeChatStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *mergeWeChatStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *mergeWeChatStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *MergeHandler) WeChatCheck(ctx context.Context, in *WeChatRequest, out *Reply) error {
+func (h *mergeHandler) WeChatCheck(ctx context.Context, in *WeChatRequest, out *Reply) error {
 	return h.MergeHandler.WeChatCheck(ctx, in, out)
 }
 
-func (h *MergeHandler) WeChatCheck(ctx context.Context, stream server.Stream) error {
-
-	m := new(WeChatRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.MergeHandler.WeChatCheck(ctx, m, &mergeWeChatCheckStream{stream})
-
-}
-
-type Merge_WeChatCheckStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type mergeWeChatCheckStream struct {
-	stream server.Stream
-}
-
-func (x *mergeWeChatCheckStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *mergeWeChatCheckStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *mergeWeChatCheckStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *mergeWeChatCheckStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (h *MergeHandler) WeChatUnMerge(ctx context.Context, in *WeChatUnMergeRequest, out *Reply) error {
+func (h *mergeHandler) WeChatUnMerge(ctx context.Context, in *WeChatUnMergeRequest, out *Reply) error {
 	return h.MergeHandler.WeChatUnMerge(ctx, in, out)
-}
-
-func (h *MergeHandler) WeChatUnMerge(ctx context.Context, stream server.Stream) error {
-
-	m := new(WeChatUnMergeRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.MergeHandler.WeChatUnMerge(ctx, m, &mergeWeChatUnMergeStream{stream})
-
-}
-
-type Merge_WeChatUnMergeStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-}
-
-type mergeWeChatUnMergeStream struct {
-	stream server.Stream
-}
-
-func (x *mergeWeChatUnMergeStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *mergeWeChatUnMergeStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *mergeWeChatUnMergeStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *mergeWeChatUnMergeStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
 }

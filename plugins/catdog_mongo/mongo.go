@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"reflect"
+	"sync"
+
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"reflect"
-	"sync"
 )
 
 var resMap sync.Map
@@ -35,7 +36,7 @@ func Watch(prefix string, value []byte) (err error) {
 	defer xerror.RespErr(&err)
 	clientAndOpts, err := buildMongoClient(prefix, value)
 	xerror.Panic(err)
-	xlog.InfoF("Watcher.catdog_mongo_plugin: build catdog_mongo_plugin client succeeded: %s", string(value))
+	xlog.Infof("Watcher.catdog_mongo_plugin: build catdog_mongo_plugin client succeeded: %s", string(value))
 	resMap.Store(prefix, clientAndOpts)
 	return
 }

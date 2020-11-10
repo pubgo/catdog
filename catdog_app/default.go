@@ -26,6 +26,24 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 		if ent == nil {
 			return xerror.New("[ent] should not be nil")
 		}
+
+		opt := ent.Options()
+		if opt.Name == "" || opt.Version == "" {
+			return xerror.New("neither [name] nor [version] can be empty")
+		}
+
+		cmd := ent.Options().Command
+		cmd.Version = ent.Options().Version
+		cmd.Use = ent.Options().Name
+		if len(ent.Options().Description) > 0 {
+			cmd.Short = ent.Options().Description[0]
+		}
+		if len(ent.Options().Description) > 1 {
+			cmd.Long = ent.Options().Description[1]
+		}
+		if len(ent.Options().Description) > 2 {
+			cmd.Example = ent.Options().Description[2]
+		}
 	}
 
 	var rootCmd = &cobra.Command{Use: catdog_config.Domain, Version: version.Version}
@@ -34,9 +52,6 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 
 	for _, ent := range entries {
 		cmd := ent.Options().Command
-		cmd.Version = ent.Options().Version
-		cmd.Use = ent.Options().Name
-		cmd.Short = ent.Options().Description
 
 		// 检查Command是否注册
 		for _, c := range rootCmd.Commands() {
@@ -61,6 +76,7 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 			if catdog_config.IsBlock {
 				ch := make(chan os.Signal, 1)
 				signal.Notify(ch, append(signalUtil.Shutdown(), syscall.SIGHUP)...)
+				<-ch
 			}
 
 			xerror.Panic(Stop())

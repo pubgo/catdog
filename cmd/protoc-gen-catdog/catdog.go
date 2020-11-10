@@ -41,7 +41,7 @@ func serverMethod(m *gen.Method) *jen.Statement {
 }
 
 func serviceClient(m *gen.Method) *jen.Statement {
-	j := jen.Id(m.P("func (c *{{.srvS}})")).Add(clientMethod(m)).BlockFunc(func(group *jen.Group) {
+	j := jen.Id(m.P("func (c *{{.srvS1}})")).Add(clientMethod(m)).BlockFunc(func(group *jen.Group) {
 		if !m.GetServerStreaming() && !m.GetClientStreaming() {
 			group.Id(m.P(`
 			req := c.c.NewRequest(c.name, "{{.srv}}.{{.mthName}}", in)
@@ -100,11 +100,6 @@ func serviceClient(m *gen.Method) *jen.Statement {
     func (x *{{.srv}}{{.mthName}}) RecvMsg(m interface{}) error {
     	return x.stream.Recv(m)
     }
-
-    func (x *{{.srv}}{{.mthName}}) Send(m *Message) error {
-    	return x.stream.Send(m)
-    }
-
 
     {{ if .cs }}
         func (x *{{.srv}}{{.mthName}}) Send(m *{{.inType}}) error{
@@ -173,12 +168,11 @@ func serviceServer(m *gen.Method) *jen.Statement {
 
 	return jen.Id(m.P(`
 	{{ if and (not .ss) (not .cs) }}
-        func (h *{{.srv}}Handler){{.mthName}}(ctx context.Context, in *{{.inType}}, out *{{.outType}}) error {
+        func (h *{{.srv1}}Handler){{.mthName}}(ctx context.Context, in *{{.inType}}, out *{{.outType}}) error {
     		return h.{{.srvH}}.{{.mthName}}(ctx, in, out)
         }
-    {{ end }}
-
-    func (h *{{.srv}}Handler){{.mthName}}(ctx context.Context, stream server.Stream) error {
+    {{ else }}
+    func (h *{{.srv1}}Handler){{.mthName}}(ctx context.Context, stream server.Stream) error {
         {{ if not .cs }}
             m := new({{.inType}})
             if err := stream.Recv(m); err != nil { return err }
@@ -235,7 +229,8 @@ func serviceServer(m *gen.Method) *jen.Statement {
             if err := x.stream.Recv(m); err != nil { return nil, err }
             return m, nil
         }
-    {{ end }}`)).Line()
+    {{ end }}
+	{{ end }}`)).Line()
 }
 
 func service(ss *gen.Service) {

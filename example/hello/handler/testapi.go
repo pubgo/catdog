@@ -13,7 +13,7 @@ type testapiHandler struct {
 }
 
 func (h *testapiHandler) Version(ctx context.Context, in *helloworld.TestReq, out *helloworld.TestApiOutput) error {
-	log.InfoF("Received Helloworld.Call request, name: %s", in.Input)
+	log.Infof("Received Helloworld.Call request, name: %s", in.Input)
 	out.Msg = in.Input
 	return nil
 }

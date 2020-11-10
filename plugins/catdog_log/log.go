@@ -4,8 +4,9 @@ import (
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
-	"github.com/pubgo/xlog/xlog_config"
 	"go.uber.org/zap"
+
+	"github.com/pubgo/xlog/xlog_config"
 )
 
 func GetDevLog() xlog.XLog {

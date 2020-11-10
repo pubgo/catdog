@@ -1,7 +1,10 @@
 package catdog_config
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/dix"
 	"path/filepath"
 	"strings"
 
@@ -9,8 +12,7 @@ import (
 	"github.com/asim/nitro/v3/config/memory"
 	"github.com/asim/nitro/v3/config/source"
 	mEnv "github.com/asim/nitro/v3/config/source/env"
-	mFile "github.com/asim/nitro/v3/config/source/file"
-	"github.com/pubgo/dix"
+	mFile "github.com/pubgo/catdog/internal/plugins/config/source/file"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 
@@ -38,35 +40,34 @@ func init() {
 
 	CfgPath = filepath.Join(Home, "config", "config.yaml")
 	if !catdog_util.PathExist(Home) {
-		xerror.Exit(xerror.Fmt("home path %s not exists", Home))
+		xerror.Exit(xerror.Fmt("home path [%s] not exists", Home))
 	}
 	if !catdog_util.PathExist(CfgPath) {
-		xerror.Exit(xerror.Fmt("config path %s not exists", CfgPath))
+		xerror.Exit(xerror.Fmt("config path [%s] not exists", CfgPath))
 	}
 
 	cfg = &Config{Config: xerror.ExitErr(memory.NewConfig()).(config.Config)}
-	xerror.Exit(cfg.Init(
-		// 加载env source
-		config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain))),
-		// 加载file source
-		config.WithSource(mFile.NewSource(
-			mFile.WithPath(filepath.Join(Home, "config", "config.yaml")),
-			source.WithEncoder(yaml.NewEncoder()),
-		)),
-	))
+	xerror.Exit(cfg.Init( // 加载env source
+		config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain)))))
+	xerror.Exit(cfg.Init( // 加载file source
+		config.WithSource(mFile.NewSource(mFile.WithPath(CfgPath), source.WithEncoder(yaml.NewEncoder())))))
 
 	// debug and trace
-	xerror.Exit(dix.WithAfterStart(func() {
+	xerror.Exit(catdog_abc.WithAfterStart(func() {
 		if !Trace {
 			return
 		}
 
-		fmt.Println("config", string(LoadBytes()))
-		fmt.Println("deps", dix.Graph())
+		var data = make(map[string]interface{})
+		xerror.Panic(json.Unmarshal(LoadBytes(), &data))
+		xlog.Debug("config trace")
+		fmt.Println(catdog_util.MarshalIndent(data))
+		xlog.Debug("deps trace")
+		fmt.Println(dix.Graph())
 	}))
 
 	// 运行环境检查
-	xerror.Exit(dix.WithBeforeStart(func() {
+	xerror.Exit(catdog_abc.WithBeforeStart(func() {
 		var m = RunMode
 		switch Mode {
 		case m.Dev, m.Stag, m.Prod, m.Test, m.Release:

@@ -77,6 +77,7 @@ proto: clear gen
 clear:
 	rm -rf example/proto/*.go
 	rm -rf example/proto/**/*.go
+	rm -rf plugins/catdog_debug/proto/*.go
 
 .PHONY: gen
 gen:

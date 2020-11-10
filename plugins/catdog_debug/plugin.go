@@ -6,15 +6,11 @@ import (
 	"github.com/pubgo/xerror"
 )
 
-type Plugin struct {
-	catdog_plugin.Plugin
-}
-
-func (p *Plugin) Handler() *catdog_handler.Handler {
-	return catdog_handler.New(NewHandler())
-}
-
 func init() {
-	p := &Plugin{Plugin: catdog_plugin.NewBase("catdog_debug")}
-	xerror.Exit(catdog_plugin.Register(p))
+	xerror.Exit(catdog_plugin.Register(&catdog_plugin.Base{
+		Name: "catdog_debug",
+		OnHandler: func() *catdog_handler.Handler {
+			return catdog_handler.New(NewHandler())
+		},
+	}))
 }

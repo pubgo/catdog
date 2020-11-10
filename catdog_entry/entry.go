@@ -3,8 +3,7 @@ package catdog_entry
 import (
 	"context"
 	"fmt"
-	"github.com/pubgo/dix"
-	"github.com/pubgo/xprocess"
+	"github.com/pubgo/catdog/internal/catdog_abc"
 	"net/http"
 	"strings"
 	"sync"
@@ -15,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/middleware"
 	ver "github.com/hashicorp/go-version"
 	"github.com/pubgo/xerror"
+	"github.com/pubgo/xprocess"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -71,10 +71,7 @@ func (r *rpcEntry) Name(name string, description ...string) error {
 	r.opts.Command.Use = name
 	r.opts.Name = r.opts.Command.Name()
 	r.opts.Command.Short = fmt.Sprintf("This is a %s service", r.opts.Name)
-
-	if len(description) > 0 {
-		r.opts.Command.Short = description[0]
-	}
+	r.opts.Description = description
 
 	return nil
 }
@@ -107,7 +104,7 @@ func (r *rpcEntry) Commands(commands ...*cobra.Command) error {
 
 // func(s server.Server, handle TestHandler, opts ...server.HandlerOption) error
 func (r *rpcEntry) Handler(hdlr interface{}, opts ...server.HandlerOption) error {
-	return xerror.Wrap(catdog_handler.Register(hdlr, opts...))
+	return xerror.Wrap(catdog_handler.Register(catdog_server.Default, hdlr, opts...))
 }
 
 func (r *rpcEntry) Plugins(pgs ...catdog_plugin.Plugin) (err error) {
@@ -137,7 +134,7 @@ func newEntry() *rpcEntry {
 		flags.StringVar(&ent.addr, "gw_addr", ent.addr, "gateway address")
 	}))
 
-	xerror.Exit(dix.WithBeforeStart(func() {
+	xerror.Exit(catdog_abc.WithBeforeStart(func() {
 		g := ent.app.Group(ent.gwPrefix)
 		handlers := catdog_server.Default.Handlers()
 		for i := range handlers {
@@ -152,24 +149,23 @@ func newEntry() *rpcEntry {
 			return nil
 		})
 
-		xerror.Exit(dix.WithBeforeStop(func() {
+		xerror.Exit(catdog_abc.WithBeforeStop(func() {
 			xerror.Panic(cancel())
+			if err := ent.app.Shutdown(); err != nil && err != http.ErrServerClosed {
+				fmt.Println(xerror.Parse(err).Println())
+			}
 		}))
 	}))
 
-	xerror.Exit(dix.WithAfterStart(func() {
-		if catdog_config.Trace {
-			for _, stacks := range ent.app.Stack() {
-				for _, stack := range stacks {
-					log.Debugf("%s %s", stack.Method, stack.Path)
-				}
-			}
+	xerror.Exit(catdog_abc.WithAfterStart(func() {
+		if !catdog_config.Trace {
+			return
 		}
-	}))
 
-	xerror.Exit(dix.WithAfterStop(func() {
-		if err := ent.app.Shutdown(); err != nil && err != http.ErrServerClosed {
-			fmt.Println(xerror.Parse(err).Println())
+		for _, stacks := range ent.app.Stack() {
+			for _, stack := range stacks {
+				log.Debugf("%s %s", stack.Method, stack.Path)
+			}
 		}
 	}))
 

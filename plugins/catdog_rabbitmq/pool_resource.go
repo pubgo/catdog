@@ -101,6 +101,6 @@ func newResource(config *RbmqConfig) pools.Factory {
 // Close is put the conn to the poll
 func (r *Resource) Close() {
 	if err := r.Connection.Close(); err != nil {
-		xlog.Error(err)
+		xlog.Error(err.Error())
 	}
 }

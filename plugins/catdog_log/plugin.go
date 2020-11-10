@@ -19,13 +19,16 @@ func init() {
 		OnFlags: func(flags *pflag.FlagSet) {
 			flags.StringVar(&config.Level, "log_level", config.Level, "log level")
 		},
-		OnWatch: func(r reader.Value) error {
+		OnInit: func() {
+
+		},
+		OnWatch: func(r reader.Value) {
 			xerror.Panic(r.Scan(&config))
 
 			zapL := xerror.PanicErr(xlog_config.NewZapLoggerFromConfig(config)).(*zap.Logger)
 			log := xlog.New(zapL.WithOptions(xlog.AddCaller(), xlog.AddCallerSkip(1)))
 			xerror.Panic(xlog.SetDefault(log.Named(catdog_config.Domain, xlog.AddCallerSkip(1))))
-			return xerror.Wrap(dix.Dix(log.Named(catdog_config.Domain)))
+			xerror.Exit(dix.Dix(log.Named(catdog_config.Domain)))
 		},
 	}))
 }

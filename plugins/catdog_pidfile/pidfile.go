@@ -7,12 +7,10 @@ import (
 	"strconv"
 
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/catdog_util"
-	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 )
 
-const pidPerm os.FileMode = 0644
+const pidPerm os.FileMode = 0755
 
 func GetPid() (pid int, _ error) {
 	pidData, err := ioutil.ReadFile(GetPidPath())
@@ -33,12 +31,4 @@ func GetPidPath() string {
 	return filepath.Join(catdog_config.Home, "pidfile", catdog_config.Domain+"."+catdog_config.Project+".pid")
 }
 
-func init() {
-	// 检查存放pid的目录是否存在, 不存在就创建
-	xerror.Exit(dix.WithBeforeStart(func() {
-		pidPath := filepath.Dir(GetPidPath())
-		if !catdog_util.PathExist(pidPath) {
-			xerror.Exit(os.MkdirAll(pidPath, pidPerm))
-		}
-	}))
-}
+func Debug() {}
