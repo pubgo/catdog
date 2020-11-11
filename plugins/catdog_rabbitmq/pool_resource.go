@@ -29,7 +29,7 @@ type ResourcePool struct {
 }
 
 // NewResourcePool create a resource pool
-func NewResourcePool(config *RbmqConfig) (*ResourcePool, error) {
+func NewResourcePool(config *rabbitConfig) (*ResourcePool, error) {
 	// Set the catdog_rabbitmq_plugin pool by DefaultCapacity
 	resourcePool := pools.NewResourcePool(newResource(config), DefaultCapacity, MaxCapacity, DefaultIdleTime, prefillParallelism, func(t time.Time) {
 		return
@@ -79,11 +79,11 @@ func (rp *ResourcePool) Get() (*Resource, error) {
 // Resource adapts a catdog_rabbitmq_plugin connection to a Vitess Resource.
 type Resource struct {
 	*amqp.Connection
-	config *RbmqConfig
+	config *rabbitConfig
 }
 
 // newResource return an closure for create a catdog_rabbitmq_plugin connection
-func newResource(config *RbmqConfig) pools.Factory {
+func newResource(config *rabbitConfig) pools.Factory {
 	return func(ctx context.Context) (pools.Resource, error) {
 		c := amqp.Config{
 			Heartbeat: DefaultHeartbeat,

@@ -18,14 +18,9 @@ func init() {
 	xerror.Exit(catdog_abc.WithBeforeStart(func() {
 		// 获取
 		cfg := catdog_config.GetCfg()
-		r, err := cfg.Load("watcher")
+		_, err := cfg.Load("watcher")
 		if err != nil {
 			xlog.Debugf("config [watcher] is error: %v", err)
-			return
-		}
-
-		cfgMap := r.StringMap(nil)
-		if cfgMap["status"] == catdog_config.PluginStop {
 			return
 		}
 

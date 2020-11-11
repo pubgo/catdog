@@ -181,7 +181,7 @@ func buildRbmqData(prefix string, value []byte) error {
 		return errors.New("watch时读取json出错,prefix= " + prefix)
 	}
 
-	var conf *RbmqConfig
+	var conf *rabbitConfig
 	var err error
 	if conf, err = Parse(value); err != nil {
 		return err
@@ -196,7 +196,7 @@ func buildRbmqData(prefix string, value []byte) error {
 	return nil
 }
 
-func store(prefix string, conf *RbmqConfig) error {
+func store(prefix string, conf *rabbitConfig) error {
 	resourcePool, err := NewResourcePool(conf)
 	if err != nil {
 		return fmt.Errorf("catdog_rabbitmq_plugin(%+v) 连接失败, error=%+v", prefix, err)

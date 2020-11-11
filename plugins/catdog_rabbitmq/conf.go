@@ -5,16 +5,16 @@ import (
 	"errors"
 )
 
-type RbmqConfig struct {
+type rabbitConfig struct {
 	URL string
 }
 
-func Parse(value []byte) (*RbmqConfig, error) {
-	rbmqConfig := new(RbmqConfig)
-	err := json.Unmarshal(value, rbmqConfig)
+func Parse(value []byte) (*rabbitConfig, error) {
+	cfg := new(rabbitConfig)
+	err := json.Unmarshal(value, cfg)
 	if err != nil {
 		return nil, errors.New("json unmarshal, error=" + err.Error())
 	}
 
-	return rbmqConfig, nil
+	return cfg, nil
 }

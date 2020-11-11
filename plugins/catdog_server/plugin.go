@@ -2,6 +2,7 @@ package catdog_server
 
 import (
 	"crypto/tls"
+
 	grpcS "github.com/asim/nitro-plugins/server/grpc/v3"
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/catdog/catdog_plugin"
@@ -13,7 +14,7 @@ import (
 func init() {
 	opts := Default.Options()
 	xerror.Exit(catdog_plugin.Register(&catdog_plugin.Base{
-		Name: "catdog_server",
+		Name: "server",
 		OnFlags: func(flags *pflag.FlagSet) {
 			flags.StringVar(&opts.Address, "server_addr", opts.Address, "server address")
 			flags.StringVar(&opts.Name, "server_name", opts.Name, "server name")
