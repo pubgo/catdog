@@ -79,7 +79,7 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 				<-ch
 			}
 
-			xerror.Panic(Stop())
+			xerror.Panic(Stop(ent))
 			return nil
 		}
 		rootCmd.AddCommand(cmd)

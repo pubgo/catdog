@@ -3,21 +3,20 @@ package catdog_watcher
 import (
 	"context"
 	"github.com/asim/nitro-plugins/config/source/etcd/v3"
-	"github.com/pubgo/catdog/internal/catdog_abc"
-	"strings"
-
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
+	"strings"
 )
 
 func init() {
 	// 检查是否有watcher
 	xerror.Exit(catdog_abc.WithBeforeStart(func() {
-		//	 获取
+		// 获取
 		cfg := catdog_config.GetCfg()
 		r, err := cfg.Load("watcher")
 		if err != nil {

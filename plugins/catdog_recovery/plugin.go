@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/server"
-	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/plugins/catdog_client"
+	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -19,7 +20,7 @@ func init() {
 	xerror.Exit(catdog_plugin.Register(&catdog_plugin.Base{
 		Name: "recovery",
 		OnInit: func() {
-			xerror.Exit(catdog_abc.WrapHandler(func(handlerFunc server.HandlerFunc) server.HandlerFunc {
+			xerror.Exit(catdog_server.WrapHandler(func(handlerFunc server.HandlerFunc) server.HandlerFunc {
 				return func(ctx context.Context, req server.Request, rsp interface{}) error {
 					t := time.Now()
 					defer func() {
@@ -66,7 +67,7 @@ func init() {
 				}
 			}))
 
-			xerror.Exit(catdog_abc.WrapCall(func(callFunc client.CallFunc) client.CallFunc {
+			xerror.Exit(catdog_client.WrapCall(func(callFunc client.CallFunc) client.CallFunc {
 				return func(ctx context.Context, addr string, req client.Request, rsp interface{}, opts client.CallOptions) error {
 					defer func() {
 						if err := recover(); err != nil {

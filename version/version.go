@@ -6,7 +6,7 @@ import (
 	"github.com/pubgo/xerror"
 
 	ver "github.com/hashicorp/go-version"
-	"github.com/pubgo/catdog/plugins/catdog_version"
+	"github.com/pubgo/catdog/catdog_version"
 )
 
 var BuildTime = ""

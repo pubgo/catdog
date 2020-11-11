@@ -296,7 +296,7 @@ func service(ss *gen.Service) {
 			group.Id(m.P(`opts = append(opts, server.EndpointMetadata("{{.mthName}}", map[string]string{"{{.http_method}}": "{{.http_path}}"}))`))
 		}
 
-		group.Id(ss.P(`return s.Handle(s.NewHandler(&{{.srv}}{h}, opts...))`))
+		group.Id(ss.P(`return s.Handler(s.NewHandler(&{{.srv}}{h}, opts...))`))
 	})
 
 	j.Line()

@@ -1,4 +1,4 @@
-package catdog_server
+package rpc_entry
 
 import (
 	"github.com/asim/nitro/v3/codec"

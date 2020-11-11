@@ -31,4 +31,4 @@ func GetPidPath() string {
 	return filepath.Join(catdog_config.Home, "pidfile", catdog_config.Domain+"."+catdog_config.Project+".pid")
 }
 
-func Debug() {}
+func Init() {}

@@ -3,6 +3,7 @@ package catdog_entry
 import (
 	"context"
 	"fmt"
+	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/internal/catdog_abc"
 	"net/http"
 	"strings"
@@ -24,18 +25,13 @@ import (
 	"github.com/pubgo/catdog/plugins/catdog_server"
 )
 
-var _ Entry = (*rpcEntry)(nil)
+var _ catdog_entry.Entry = (*rpcEntry)(nil)
 
 type rpcEntry struct {
-	opts     Options
-	mux      sync.Mutex
-	app      *fiber.App
-	addr     string
-	gwPrefix string
-}
-
-func (r *rpcEntry) Task(name string, handler interface{}, opts ...server.SubscriberOption) error {
-	panic("implement me")
+	opts catdog_entry.Options
+	mux  sync.Mutex
+	app  *fiber.App
+	addr string
 }
 
 func (r *rpcEntry) Group(relativePath string, handlers ...fiber.Handler) fiber.Router {
@@ -53,7 +49,7 @@ func (r *rpcEntry) middleware() []interface{} {
 
 }
 
-func (r *rpcEntry) Options() Options {
+func (r *rpcEntry) Options() catdog_entry.Options {
 	return r.opts
 }
 
@@ -102,7 +98,6 @@ func (r *rpcEntry) Commands(commands ...*cobra.Command) error {
 	return nil
 }
 
-// func(s server.Server, handle TestHandler, opts ...server.HandlerOption) error
 func (r *rpcEntry) Handler(hdlr interface{}, opts ...server.HandlerOption) error {
 	return xerror.Wrap(catdog_handler.Register(catdog_server.Default, hdlr, opts...))
 }
@@ -119,28 +114,17 @@ func (r *rpcEntry) Plugins(pgs ...catdog_plugin.Plugin) (err error) {
 
 func newEntry() *rpcEntry {
 	ent := &rpcEntry{
-		opts: Options{
+		opts: catdog_entry.Options{
 			RunCommand: &cobra.Command{Use: "run"},
 			Command:    &cobra.Command{},
 		},
-		app:      fiber.New(),
-		addr:     ":8080",
-		gwPrefix: "api",
+		app:  fiber.New(),
+		addr: ":8080",
 	}
 	ent.opts.Command.AddCommand(ent.opts.RunCommand)
 	ent.app.Use(ent.middleware()...)
 
-	xerror.Exit(ent.Flags(func(flags *pflag.FlagSet) {
-		flags.StringVar(&ent.addr, "gw_addr", ent.addr, "gateway address")
-	}))
-
 	xerror.Exit(catdog_abc.WithBeforeStart(func() {
-		g := ent.app.Group(ent.gwPrefix)
-		handlers := catdog_server.Default.Handlers()
-		for i := range handlers {
-			xerror.Panic(handlers[i](g))
-		}
-
 		cancel := xprocess.Go(func(ctx context.Context) (err error) {
 			defer xerror.RespErr(&err)
 			log.Infof("Server [http] Listening on http://%s", ent.addr)
@@ -172,6 +156,6 @@ func newEntry() *rpcEntry {
 	return ent
 }
 
-func New() Entry {
+func New() catdog_entry.Entry {
 	return newEntry()
 }

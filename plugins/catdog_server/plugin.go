@@ -1,8 +1,11 @@
 package catdog_server
 
 import (
+	"crypto/tls"
+	grpcS "github.com/asim/nitro-plugins/server/grpc/v3"
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/catdog/catdog_plugin"
+	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
 	"github.com/spf13/pflag"
 )
@@ -16,8 +19,14 @@ func init() {
 			flags.StringVar(&opts.Name, "server_name", opts.Name, "server name")
 		},
 		OnInit: func() {
-			xerror.Exit(Default.Server.Init(server.Name(opts.Name)))
-			xerror.Exit(Default.Server.Init(server.Address(opts.Address)))
+			xerror.Exit(catdog_abc.WithBeforeStart(func() {
+				xerror.Exit(Default.Server.Init(server.Name(opts.Name)))
+				xerror.Exit(Default.Server.Init(server.Address(opts.Address)))
+
+				var t *tls.Config
+				// WithTLS sets the TLS config for the catdog_service
+				xerror.Exit(Default.Init(grpcS.AuthTLS(t)))
+			}))
 		},
 	}))
 }

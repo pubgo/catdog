@@ -1,12 +1,11 @@
 package catdog_config
 
 import (
-	"path/filepath"
-
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/xerror"
 	"github.com/spf13/pflag"
+	"path/filepath"
 )
 
 // 默认的全局配置
@@ -50,10 +49,6 @@ func DefaultFlags() *pflag.FlagSet {
 	flags.BoolVarP(&IsBlock, "block", "b", IsBlock, "enable signal block")
 	flags.StringVarP(&Project, "project", "p", Project, "project name")
 	return flags
-}
-
-func Init(opts ...config.Option) {
-	xerror.Exit(cfg.Init(opts...))
 }
 
 func Load(path ...string) (reader.Value, error) {

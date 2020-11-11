@@ -1,10 +1,7 @@
 package catdog_config
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/pubgo/catdog/internal/catdog_abc"
-	"github.com/pubgo/dix"
 	"path/filepath"
 	"strings"
 
@@ -21,7 +18,8 @@ import (
 	"github.com/pubgo/catdog/internal/plugins/config/encoder/yaml"
 )
 
-func init() {
+func Init() (err error) {
+	defer xerror.RespErr(&err)
 	// 从环境变量中获取系统默认值
 	// 获取系统默认的前缀, 环境变量前缀等
 	catdog_env.Get(&Domain, "catdog", "catdog_domain", "catdog_prefix", "env_prefix")
@@ -52,19 +50,10 @@ func init() {
 	xerror.Exit(cfg.Init( // 加载file source
 		config.WithSource(mFile.NewSource(mFile.WithPath(CfgPath), source.WithEncoder(yaml.NewEncoder())))))
 
-	// debug and trace
-	xerror.Exit(catdog_abc.WithAfterStart(func() {
-		if !Trace {
-			return
-		}
-
-		var data = make(map[string]interface{})
-		xerror.Panic(json.Unmarshal(LoadBytes(), &data))
-		xlog.Debug("config trace")
-		fmt.Println(catdog_util.MarshalIndent(data))
-		xlog.Debug("deps trace")
-		fmt.Println(dix.Graph())
-	}))
+	_, err = cfg.Load("watcher")
+	if err != nil {
+		xlog.Debugf("config [watcher] is error: %v", err)
+	}
 
 	// 运行环境检查
 	xerror.Exit(catdog_abc.WithBeforeStart(func() {
@@ -75,4 +64,5 @@ func init() {
 			xerror.Exit(xerror.Fmt("running mode does not match, mode: %s", Mode))
 		}
 	}))
+	return nil
 }

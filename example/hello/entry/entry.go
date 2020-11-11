@@ -1,23 +1,12 @@
-package hello
+package entry
 
 import (
-	"github.com/pubgo/xerror"
-	"github.com/pubgo/xlog"
-
 	"github.com/pubgo/catdog"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/example/hello/handler"
-	"github.com/pubgo/catdog/plugins/catdog_log"
 	"github.com/pubgo/catdog/version"
+	"github.com/pubgo/xerror"
 )
-
-var log xlog.XLog
-
-func init() {
-	xerror.Exit(catdog_log.Watch(func(logs xlog.XLog) {
-		log = logs.Named("hello")
-	}))
-}
 
 func GetEntry() catdog.Entry {
 	//catdog_config.Domain = "dev"

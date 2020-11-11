@@ -1,4 +1,4 @@
-package catdog_server
+package rpc_entry
 
 import (
 	"context"

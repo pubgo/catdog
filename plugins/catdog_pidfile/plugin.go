@@ -1,16 +1,13 @@
 package catdog_pidfile
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
-	"github.com/pubgo/xlog"
 )
 
 func init() {
@@ -28,13 +25,6 @@ func init() {
 			// 保存pid到文件当中
 			xerror.Panic(catdog_abc.WithAfterStart(func() {
 				xerror.Panic(SavePid())
-
-				if catdog_config.Trace {
-					pid, err := GetPid()
-					xerror.Panic(err)
-					xlog.Debugf("path, pid trace")
-					fmt.Println(GetPidPath(), pid)
-				}
 			}))
 		},
 	}))

@@ -14,10 +14,10 @@ proto: clear
 
 .PHONY: run build
 run: proto
-	go run cmd/main.go
+	go run main.go
 
 build:
-	go build -o main cmd/main.go
+	go build -o main main.go
 
 .PHONY: test
 test:
