@@ -11,25 +11,28 @@ import (
 	"github.com/asim/nitro/v3/server"
 	"github.com/gofiber/fiber"
 	"github.com/pubgo/xerror"
+	"github.com/pubgo/xlog"
 )
 
-type wrapper struct {
+type wrapperServer struct {
 	server.Server
 	handlers []func(g fiber.Router) error
 }
 
-func (r *wrapper) httpHandler(httpMethod, path string, handlers ...fiber.Handler) {
+func (r *wrapperServer) httpHandler(httpMethod, path string, handlers ...fiber.Handler) {
 	r.handlers = append(r.handlers, func(router fiber.Router) error {
 		if router == nil {
 			return xerror.New("[router] should not be nil")
 		}
+
+		xlog.Debugf("%s %s", httpMethod, path)
 
 		router.Add(strings.ToUpper(httpMethod), path, handlers...)
 		return nil
 	})
 }
 
-func (r *wrapper) Handle(handler server.Handler) (err error) {
+func (r *wrapperServer) Handle(handler server.Handler) (err error) {
 	defer xerror.RespErr(&err)
 	if handler == nil {
 		return xerror.New("[handler] should not be nil")

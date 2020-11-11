@@ -26,3 +26,5 @@ func init() {
 		},
 	}))
 }
+
+//xerror.Exit(r.s.Init(server.Broker(catdog_broker.Default.Broker)))

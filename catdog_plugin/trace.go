@@ -1,4 +1,4 @@
-package catdog_client
+package catdog_plugin
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ func init() {
 			return
 		}
 
-		xlog.Debug("client trace")
-		fmt.Printf("%s\n", Default.Client.String())
+		xlog.Debug("plugins trace")
+		fmt.Println(String())
 	}))
 }

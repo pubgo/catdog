@@ -15,15 +15,15 @@ func Start(ent catdog_entry.Entry) (err error) {
 	catdog_server.Default.Server = ent.Server()
 	catdog_client.Default.Client = ent.Client()
 
-	// 启动配置, 初始化组件
-	entPlugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))
-	for _, pl := range append(catdog_plugin.List(), entPlugins...) {
-		key := pl.String()
+	// 启动配置, 初始化组件, 初始化插件
+	plugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))
+	for _, pg := range append(catdog_plugin.List(), plugins...) {
+		key := pg.String()
 		r, err := catdog_config.Load(key)
 		xerror.PanicF(err, "plugin [%s] load error", key)
-		xerror.PanicF(pl.Init(r), "plugin [%s] init error", key)
+		xerror.PanicF(pg.Init(r), "plugin [%s] init error", key)
 
-		hdlr := pl.Handler()
+		hdlr := pg.Handler()
 		if hdlr != nil {
 			xerror.Panic(ent.Handler(hdlr, hdlr.Opts...))
 		}
