@@ -2,6 +2,8 @@ package catdog_watcher
 
 import (
 	"context"
+	"strings"
+
 	"github.com/asim/nitro-plugins/config/source/etcd/v3"
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/reader"
@@ -10,7 +12,6 @@ import (
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
-	"strings"
 )
 
 func init() {
@@ -53,10 +54,6 @@ func Watch(name string, watcher func(r reader.Value) error) error {
 
 	return xerror.Wrap(catdog_abc.WithBeforeStart(func() {
 		key := strings.Join([]string{catdog_config.Project, name}, ".")
-		resp := xerror.PanicErr(catdog_config.Load(key)).(reader.Value)
-		if resp.Bytes() != nil {
-			xerror.Panic(watcher(resp))
-		}
 
 		xlog.Debugf("Start Watch Config, Key: %s", key)
 		w := xerror.PanicErr(catdog_config.GetCfg().Watch(key)).(config.Watcher)

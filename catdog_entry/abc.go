@@ -7,7 +7,13 @@ import (
 	"github.com/spf13/pflag"
 )
 
+type RpcEntry interface {
+	Entry
+}
+
 type Entry interface {
+	Start() error
+	Stop() error
 	Server() server.Server
 	Client() client.Client
 	Name(name string, description ...string) error
@@ -16,8 +22,6 @@ type Entry interface {
 	Commands(commands ...*cobra.Command) error
 	Options() Options
 	Handler(handler interface{}, opts ...server.HandlerOption) error
-	Start() error
-	Stop() error
 }
 
 type Option func(o *Options)

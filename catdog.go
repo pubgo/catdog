@@ -5,7 +5,7 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_entry/rpc_entry"
-	"github.com/pubgo/catdog/plugins/catdog_pidfile"
+	"github.com/pubgo/catdog/catdog_pidfile"
 	"github.com/pubgo/xerror"
 )
 
@@ -26,6 +26,6 @@ func Init() (err error) {
 
 type Entry = catdog_entry.Entry
 
-func NewEntry() catdog_entry.Entry {
+func NewEntry() catdog_entry.RpcEntry {
 	return rpc_entry.New()
 }

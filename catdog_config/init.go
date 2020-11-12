@@ -44,11 +44,12 @@ func Init() (err error) {
 		xerror.Exit(xerror.Fmt("config path [%s] not exists", CfgPath))
 	}
 
-	cfg = &Config{Config: xerror.ExitErr(memory.NewConfig()).(config.Config)}
-	xerror.Exit(cfg.Init( // 加载env source
-		config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain)))))
-	xerror.Exit(cfg.Init( // 加载file source
-		config.WithSource(mFile.NewSource(mFile.WithPath(CfgPath), source.WithEncoder(yaml.NewEncoder())))))
+	cfg = &Config{Config: xerror.ExitErr(memory.NewConfig(
+		// 加载env source
+		config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain))),
+		// 加载file source
+		config.WithSource(mFile.NewSource(mFile.WithPath(CfgPath), source.WithEncoder(yaml.NewEncoder()))),
+	)).(config.Config)}
 
 	_, err = cfg.Load("watcher")
 	if err != nil {

@@ -2,6 +2,7 @@ package catdog_client
 
 import (
 	"fmt"
+
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
@@ -15,6 +16,7 @@ func init() {
 		}
 
 		xlog.Debug("client trace")
-		fmt.Printf("%s\n", Default.Client.String())
+		fmt.Printf("%#v\n", Default.Client)
+		fmt.Println()
 	}))
 }

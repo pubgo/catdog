@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	grpcC "github.com/asim/nitro-plugins/client/grpc/v3"
 	grpcS "github.com/asim/nitro-plugins/server/grpc/v3"
+	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/catdog/plugins/catdog_server"
@@ -18,7 +19,7 @@ func init() {
 		OnFlags: func(flags *pflag.FlagSet) {
 			_ = opts
 		},
-		OnInit: func() {
+		OnInit: func(r reader.Value) {
 			xerror.Exit(catdog_abc.WithBeforeStart(func() {
 				var t *tls.Config
 				// WithTLS sets the TLS config for the catdog_service

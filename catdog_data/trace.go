@@ -5,6 +5,7 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
+	"github.com/pubgo/xlog"
 )
 
 func init() {
@@ -13,8 +14,10 @@ func init() {
 			return
 		}
 
-		for k := range List() {
-			fmt.Println(k)
+		xlog.Debug("data trace")
+		for k, v := range List() {
+			fmt.Printf("%s: %#v\n", k, v)
 		}
+		fmt.Println()
 	}))
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
+	"github.com/pubgo/xlog"
 )
 
 func init() {
@@ -15,7 +16,9 @@ func init() {
 		}
 
 		for name, v := range List() {
-			fmt.Println(name, catdog_util.MarshalIndent(v))
+			xlog.Debug(name)
+			fmt.Println(catdog_util.MarshalIndent(v))
 		}
+		fmt.Println()
 	}))
 }

@@ -16,7 +16,7 @@ func init() {
 
 		pid, err := GetPid()
 		xerror.Panic(err)
-		xlog.Debugf("path, pid trace")
-		fmt.Println(GetPidPath(), pid)
+		xlog.Debug("pidfile trace", xlog.Int("pid", pid), xlog.String("path", GetPidPath()))
+		fmt.Println()
 	}))
 }

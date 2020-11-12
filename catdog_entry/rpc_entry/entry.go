@@ -3,12 +3,13 @@ package rpc_entry
 import (
 	"context"
 	"fmt"
-	grpcC "github.com/asim/nitro-plugins/client/grpc/v3"
+	"github.com/pubgo/xlog"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	grpcC "github.com/asim/nitro-plugins/client/grpc/v3"
 	"github.com/asim/nitro-plugins/server/grpc/v3"
 	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/server"
@@ -16,7 +17,6 @@ import (
 	"github.com/gofiber/fiber/middleware"
 	ver "github.com/hashicorp/go-version"
 	"github.com/pubgo/xerror"
-	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -25,7 +25,6 @@ import (
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/internal/catdog_abc"
-	"github.com/pubgo/catdog/plugins/catdog_client"
 )
 
 const defaultContentType = "application/json"
@@ -33,7 +32,7 @@ const defaultContentType = "application/json"
 var _ catdog_entry.Entry = (*rpcEntry)(nil)
 
 type rpcEntry struct {
-	s        *wrapperServer
+	s        *serverWrapper
 	c        client.Client
 	opts     catdog_entry.Options
 	mux      sync.Mutex
@@ -47,7 +46,7 @@ func (r *rpcEntry) Server() server.Server {
 }
 
 func (r *rpcEntry) Client() client.Client {
-	return catdog_client.Default.Client
+	return r.c
 }
 
 func (r *rpcEntry) Start() (err error) {
@@ -57,8 +56,6 @@ func (r *rpcEntry) Start() (err error) {
 	for i := range r.s.handlers {
 		xerror.Panic(r.s.handlers[i](g))
 	}
-
-	xlog.Debugf("%d", len(r.s.handlers))
 
 	cancel := xprocess.Go(func(ctx context.Context) (err error) {
 		defer xerror.RespErr(&err)
@@ -149,7 +146,7 @@ func (r *rpcEntry) Handler(hdlr interface{}, opts ...server.HandlerOption) error
 func newEntry() *rpcEntry {
 	ent := &rpcEntry{
 		c: grpcC.NewClient(),
-		s: &wrapperServer{Server: grpc.NewServer(server.Context(context.Background()))},
+		s: &serverWrapper{Server: grpc.NewServer(server.Context(context.Background()))},
 		opts: catdog_entry.Options{
 			RunCommand: &cobra.Command{Use: "run"},
 			Command:    &cobra.Command{},
@@ -170,11 +167,17 @@ func newEntry() *rpcEntry {
 			return
 		}
 
+		xlog.Debug("rpc entry trace")
 		for _, stacks := range ent.app.Stack() {
 			for _, stack := range stacks {
+				if stack.Path == "/" {
+					continue
+				}
+
 				log.Debugf("%s %s", stack.Method, stack.Path)
 			}
 		}
+		fmt.Println()
 	}))
 
 	return ent

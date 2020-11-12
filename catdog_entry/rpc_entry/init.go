@@ -1,7 +1,7 @@
 package rpc_entry
 
 import (
-	"github.com/pubgo/catdog/plugins/catdog_log"
+	"github.com/pubgo/catdog/catdog_log"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 )

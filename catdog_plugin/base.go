@@ -1,12 +1,12 @@
 package catdog_plugin
 
 import (
-	"github.com/pubgo/xerror"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_handler"
+	"github.com/pubgo/xerror"
+	"github.com/pubgo/xlog"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var _ Plugin = (*Base)(nil)
@@ -14,7 +14,7 @@ var _ Plugin = (*Base)(nil)
 type Base struct {
 	Name       string
 	Enabled    bool `yaml:"enabled"`
-	OnInit     func()
+	OnInit     func(r reader.Value)
 	OnWatch    func(r reader.Value)
 	OnCommands func(cmd *cobra.Command)
 	OnHandler  func() *catdog_handler.Handler
@@ -23,15 +23,22 @@ type Base struct {
 
 func (p *Base) Init(r reader.Value) (err error) {
 	defer xerror.RespErr(&err)
-
 	xerror.Panic(r.Scan(p))
+
+	var status = "disabled"
+	if p.Enabled {
+		status = "enabled"
+	}
+
+	xlog.Debugf("[%s] init, status: %s", p.Name, status)
 
 	if !p.Enabled {
 		return nil
 	}
 
 	if p.OnInit != nil {
-		p.OnInit()
+		xlog.Debugf("[%s] start init", p.Name)
+		p.OnInit(r)
 	}
 	return nil
 }
@@ -44,6 +51,7 @@ func (p *Base) Watch(r reader.Value) (err error) {
 	}
 
 	if p.OnWatch != nil {
+		xlog.Debugf("[%s] start watch", p.Name)
 		p.OnWatch(r)
 	}
 	return nil

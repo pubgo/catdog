@@ -2,6 +2,7 @@ package catdog_server
 
 import (
 	"crypto/tls"
+	"github.com/asim/nitro/v3/config/reader"
 
 	grpcS "github.com/asim/nitro-plugins/server/grpc/v3"
 	"github.com/asim/nitro/v3/server"
@@ -19,7 +20,7 @@ func init() {
 			flags.StringVar(&opts.Address, "server_addr", opts.Address, "server address")
 			flags.StringVar(&opts.Name, "server_name", opts.Name, "server name")
 		},
-		OnInit: func() {
+		OnInit: func(r reader.Value) {
 			xerror.Exit(catdog_abc.WithBeforeStart(func() {
 				xerror.Exit(Default.Server.Init(server.Name(opts.Name)))
 				xerror.Exit(Default.Server.Init(server.Address(opts.Address)))

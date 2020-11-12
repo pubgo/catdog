@@ -9,6 +9,7 @@ import (
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
+	"github.com/pubgo/xprocess"
 )
 
 func init() {
@@ -22,8 +23,16 @@ func init() {
 		xerror.Panic(json.Unmarshal(LoadBytes(), &data))
 		xlog.Debug("config trace")
 		fmt.Println(catdog_util.MarshalIndent(data))
+		fmt.Println()
 
 		xlog.Debug("deps trace")
 		fmt.Println(dix.Graph())
+		fmt.Println()
+
+		xlog.Debug("goroutine trace")
+		data = make(map[string]interface{})
+		xerror.Panic(json.Unmarshal([]byte(xprocess.Stack()), &data))
+		fmt.Println(catdog_util.MarshalIndent(data))
+		fmt.Println()
 	}))
 }

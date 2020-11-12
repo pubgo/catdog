@@ -1,6 +1,7 @@
 package catdog_log
 
 import (
+	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -15,7 +16,7 @@ func GetDevLog() xlog.XLog {
 		xerror.Exit(err)
 	}
 
-	zl = zl.WithOptions(zap.AddCaller(), zap.AddCallerSkip(1)).Named("debug")
+	zl = zl.WithOptions(zap.AddCaller(), zap.AddCallerSkip(1)).Named(catdog_config.Project)
 	return xlog.New(zl)
 }
 

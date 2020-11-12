@@ -37,4 +37,5 @@ mongodb:
   default:
     url: "mongodb://localhost:8080"
 log:
-  level: "catdog_debug_plugin"
+  enabled: true
+  level: "debug"
