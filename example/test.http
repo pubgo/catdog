@@ -1,5 +1,5 @@
 ### example测试
-POST http://localhost:8080/v1/example/version
+POST http://localhost:8080/hello2/v1/example/version
 Content-Type: application/json
 
 {
@@ -7,13 +7,13 @@ Content-Type: application/json
 }
 
 ### health
-POST http://localhost:8080/gw/health
+POST http://localhost:8080/api/health
 Content-Type: application/json
 
 {}
 
 ### hello
-POST http://localhost:8080/health
+POST http://localhost:8080/api/health
 Content-Type: application/json
 
 {

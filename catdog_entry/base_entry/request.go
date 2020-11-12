@@ -1,4 +1,4 @@
-package rpc_entry
+package base_entry
 
 import (
 	"github.com/asim/nitro/v3/codec"

@@ -1,4 +1,4 @@
-package entry1
+package entry2
 
 import (
 	"github.com/pubgo/catdog"
@@ -11,8 +11,8 @@ import (
 func GetEntry() catdog.Entry {
 	//catdog_config.Domain = "dev"
 
-	ent := catdog.NewRpcEntry("hello1")
-	xerror.Exit(ent.Description("hello1 服务"))
+	ent := catdog.NewRestEntry("hello2")
+	xerror.Exit(ent.Description("hello2 rest 服务"))
 	xerror.Exit(ent.Version(version.Version))
 
 	xerror.Exit(ent.Handler(handler.NewHelloworld()))

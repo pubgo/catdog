@@ -1,10 +1,9 @@
-package http
+package server_http
 
 import (
 	"context"
-	"github.com/asim/nitro/v3/broker"
+
 	"github.com/asim/nitro/v3/codec"
-	"github.com/asim/nitro/v3/registry"
 	"github.com/asim/nitro/v3/server"
 )
 
@@ -17,14 +16,6 @@ func newOptions(opt ...server.Option) server.Options {
 
 	for _, o := range opt {
 		o(&opts)
-	}
-
-	if opts.Broker == nil {
-		opts.Broker = broker.DefaultBroker
-	}
-
-	if opts.Registry == nil {
-		opts.Registry = registry.DefaultRegistry
 	}
 
 	if len(opts.Address) == 0 {

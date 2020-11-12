@@ -49,9 +49,9 @@ func Address(addr string) Option {
 }
 
 // name of the catdog_service
-func Name(n string) Option {
+func Description(n string) Option {
 	return func(o *Options) {
-		xerror.Exit(Default.Server.Init(server.Name(n)))
+		xerror.Exit(Default.Server.Init(server.Description(n)))
 	}
 }
 

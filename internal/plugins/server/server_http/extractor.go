@@ -1,9 +1,8 @@
-package http
+package server_http
 
 import (
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/asim/nitro/v3/registry"
@@ -13,7 +12,6 @@ import (
 
 func serviceDef(opts server.Options) *registry.Service {
 	var advt, host string
-	var port int
 
 	if len(opts.Advertise) > 0 {
 		advt = opts.Advertise
@@ -24,7 +22,6 @@ func serviceDef(opts server.Options) *registry.Service {
 	parts := strings.Split(advt, ":")
 	if len(parts) > 1 {
 		host = strings.Join(parts[:len(parts)-1], ":")
-		port, _ = strconv.Atoi(parts[len(parts)-1])
 	} else {
 		host = parts[0]
 	}
@@ -37,7 +34,6 @@ func serviceDef(opts server.Options) *registry.Service {
 	node := &registry.Node{
 		Id:       opts.Name + "-" + opts.Id,
 		Address:  addr,
-		Port:     port,
 		Metadata: opts.Metadata,
 	}
 

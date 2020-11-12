@@ -1,4 +1,4 @@
-package http
+package server_http
 
 import (
 	"github.com/asim/nitro/v3/registry"

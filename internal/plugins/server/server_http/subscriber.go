@@ -1,18 +1,18 @@
-package http
+package server_http
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/codec"
-	"github.com/asim/nitro/v3/metadata"
-	"github.com/asim/nitro/v3/registry"
-	"github.com/asim/nitro/v3/server"
 	"reflect"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/codec"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/server"
 )
 
 const (
@@ -181,10 +181,10 @@ func validateSubscriber(sub server.Subscriber) error {
 	return nil
 }
 
-func (s *httpServer) createSubHandler(sb *httpSubscriber, opts server.Options) broker.Handler {
+func (t *httpServer) createSubHandler(sb *httpSubscriber, opts server.Options) broker.Handler {
 	return func(msg *broker.Message) error {
 		ct := msg.Header["Content-Type"]
-		cf, err := s.newCodec(ct)
+		cf, err := t.newCodec(ct)
 		if err != nil {
 			return err
 		}
@@ -194,7 +194,7 @@ func (s *httpServer) createSubHandler(sb *httpSubscriber, opts server.Options) b
 			hdr[k] = v
 		}
 		delete(hdr, "Content-Type")
-		ctx := metadata.NewContext(context.Background(), hdr)
+		//ctx := metadata.NewContext(context.Background(), hdr)
 
 		results := make(chan error, len(sb.handlers))
 
@@ -249,11 +249,11 @@ func (s *httpServer) createSubHandler(sb *httpSubscriber, opts server.Options) b
 			}
 
 			go func() {
-				results <- fn(ctx, &httpMessage{
-					topic:       sb.topic,
-					contentType: ct,
-					payload:     req.Interface(),
-				})
+				//results <- fn(ctx, &httpMessage{
+				//	topic:       sb.topic,
+				//	contentType: ct,
+				//	payload:     req.Interface(),
+				//})
 			}()
 		}
 

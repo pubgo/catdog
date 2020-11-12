@@ -11,8 +11,8 @@ import (
 func GetEntry() catdog.Entry {
 	//catdog_config.Domain = "dev"
 
-	ent := catdog.NewEntry()
-	xerror.Exit(ent.Name("hello", "hello 服务"))
+	ent := catdog.NewRpcEntry("hello")
+	xerror.Exit(ent.Description("hello 服务"))
 	xerror.Exit(ent.Version(version.Version))
 
 	xerror.Exit(ent.Handler(handler.NewHelloworld()))

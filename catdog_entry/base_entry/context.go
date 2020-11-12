@@ -1,4 +1,4 @@
-package rpc_entry
+package base_entry
 
 import (
 	"context"

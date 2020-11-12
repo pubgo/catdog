@@ -1,4 +1,4 @@
-package rpc_entry
+package server_http
 
 import (
 	"github.com/pubgo/catdog/catdog_log"
@@ -6,12 +6,10 @@ import (
 	"github.com/pubgo/xlog"
 )
 
-const Name = "rpc_entry"
-
 var log xlog.XLog
 
 func init() {
 	xerror.Exit(catdog_log.Watch(func(logs xlog.XLog) {
-		log = logs.Named(Name)
+		log = logs.Named("http.server")
 	}))
 }

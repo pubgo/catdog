@@ -7,15 +7,12 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/catdog/plugins/catdog_client"
-	"github.com/pubgo/catdog/plugins/catdog_server"
 )
 
 func Start(ent catdog_entry.Entry) (err error) {
 	defer xerror.RespErr(&err)
-	catdog_server.Default.Server = ent.Server()
-	catdog_client.Default.Client = ent.Client()
-	catdog_config.Project = ent.Options().Name
+
+	xerror.Panic(ent.Init())
 
 	// 启动配置, 初始化组件, 初始化插件
 	plugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))

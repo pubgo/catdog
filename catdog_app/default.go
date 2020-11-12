@@ -35,15 +35,6 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 		cmd := ent.Options().Command
 		cmd.Version = ent.Options().Version
 		cmd.Use = ent.Options().Name
-		if len(ent.Options().Description) > 0 {
-			cmd.Short = ent.Options().Description[0]
-		}
-		if len(ent.Options().Description) > 1 {
-			cmd.Long = ent.Options().Description[1]
-		}
-		if len(ent.Options().Description) > 2 {
-			cmd.Example = ent.Options().Description[2]
-		}
 	}
 
 	var rootCmd = &cobra.Command{Use: catdog_config.Domain, Version: version.Version}
@@ -51,6 +42,7 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return xerror.Wrap(cmd.Help()) }
 
 	for _, ent := range entries {
+		ent := ent
 		cmd := ent.Options().Command
 
 		// 检查Command是否注册

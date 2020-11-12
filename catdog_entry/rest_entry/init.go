@@ -1,4 +1,4 @@
-package catdog_entry
+package rest_entry
 
 import (
 	"github.com/pubgo/catdog/catdog_log"
@@ -6,7 +6,7 @@ import (
 	"github.com/pubgo/xlog"
 )
 
-const Name = "rest"
+const Name = "rest_entry"
 
 var log xlog.XLog
 

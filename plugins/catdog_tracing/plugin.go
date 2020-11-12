@@ -12,95 +12,95 @@ var tracerCloser io.Closer
 
 /*
 	cli.StringFlag{
-		Name:   "jaeger_service_name",
+		Description:   "jaeger_service_name",
 		Value:  "",
 		Usage:  "The service name",
 		EnvVar: "JAEGER_SERVICE_NAME",
 	}
 		cli.StringFlag{
-			Name:   "jaeger_disabled",
+			Description:   "jaeger_disabled",
 			Usage:  "Whether the Plugin is disabled or not. If true, the default opentracing.NoopTracer is used.",
 			EnvVar: "JAEGER_DISABLED",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_RPC_metrics",
+			Description:   "jaeger_RPC_metrics",
 			Usage:  "Whether to store RPC metrics",
 			EnvVar: "JAEGER_RPC_METRICS",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_tags",
+			Description:   "jaeger_tags",
 			Usage:  "A comma separated list of name = value Plugin level tags, which get added to all reported spans.",
 			EnvVar: "JAEGER_TAGS",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_sampler_type",
+			Description:   "jaeger_sampler_type",
 			Value:  "const",
 			Usage:  "The sampler type",
 			EnvVar: "JAEGER_SAMPLER_TYPE",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_sampler_param",
+			Description:   "jaeger_sampler_param",
 			Value:  "1",
 			Usage:  "The sampler parameter (number)",
 			EnvVar: "JAEGER_SAMPLER_PARAM",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_sampler_manager_host_port",
+			Description:   "jaeger_sampler_manager_host_port",
 			Usage:  "The HTTP endpoint when using the remote sampler, i.e. http://jaeger-agent:5778/sampling",
 			EnvVar: "JAEGER_SAMPLER_MANAGER_HOST_PORT",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_sampler_max_operations",
+			Description:   "jaeger_sampler_max_operations",
 			Usage:  "The maximum number of operations that the sampler will keep track of",
 			EnvVar: "JAEGER_SAMPLER_MAX_OPERATIONS",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_sampler_refresh_interval",
+			Description:   "jaeger_sampler_refresh_interval",
 			Usage:  "How often the remotely controlled sampler will poll jaeger-agent for the appropriate sampling strategy, with units",
 			EnvVar: "JAEGER_SAMPLER_REFRESH_INTERVAL",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_reporter_max_queue_size",
+			Description:   "jaeger_reporter_max_queue_size",
 			Usage:  "The reporter's maximum queue size",
 			EnvVar: "JAEGER_REPORTER_MAX_QUEUE_SIZE",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_reporter_flush_interval",
+			Description:   "jaeger_reporter_flush_interval",
 			Usage:  "The reporter's flush interval, with units, e.g. 500ms or 2s (valid units)",
 			EnvVar: "JAEGER_REPORTER_FLUSH_INTERVAL",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_reporter_log_spans",
+			Description:   "jaeger_reporter_log_spans",
 			Usage:  "Whether the reporter should also log the spans",
 			EnvVar: "JAEGER_REPORTER_LOG_SPANS",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_endpoint",
+			Description:   "jaeger_endpoint",
 			Usage:  "The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces",
 			EnvVar: "JAEGER_ENDPOINT",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_user",
+			Description:   "jaeger_user",
 			Usage:  "Username to send as part of Basic authentication to the collector endpoint",
 			EnvVar: "JAEGER_USER",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_password",
+			Description:   "jaeger_password",
 			Usage:  "Password to send as part of Basic authentication to the collector endpoint",
 			EnvVar: "JAEGER_PASSWORD",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_agent_host",
+			Description:   "jaeger_agent_host",
 			Usage:  "The hostname for communicating with agent via UDP",
 			EnvVar: "JAEGER_AGENT_HOST",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_agent_port",
+			Description:   "jaeger_agent_port",
 			Usage:  "The port for communicating with agent via UDP",
 			EnvVar: "JAEGER_AGENT_PORT",
 		}
 		cli.StringFlag{
-			Name:   "jaeger_save_as_file",
+			Description:   "jaeger_save_as_file",
 			Value:  "1",
 			Usage:  "Use the self-implemented transport. Save the spans into a log file with http reporter's rules. Default is true.",
 			EnvVar: "JAEGER_SAVE_AS_FILE",

@@ -1,9 +1,10 @@
 // Package http implements a go-micro.Server
-package http
+package server_http
 
 import (
 	"errors"
 	"fmt"
+	"github.com/pubgo/xerror"
 	"net"
 	"net/http"
 	"sort"
@@ -39,8 +40,8 @@ type httpServer struct {
 	registered bool
 }
 
-func (h *httpServer) newCodec(contentType string) (codec.NewCodec, error) {
-	if cf, ok := h.opts.Codecs[contentType]; ok {
+func (t *httpServer) newCodec(contentType string) (codec.NewCodec, error) {
+	if cf, ok := t.opts.Codecs[contentType]; ok {
 		return cf, nil
 	}
 	if cf, ok := defaultCodecs[contentType]; ok {
@@ -49,33 +50,33 @@ func (h *httpServer) newCodec(contentType string) (codec.NewCodec, error) {
 	return nil, fmt.Errorf("Unsupported Content-Type: %s", contentType)
 }
 
-func (h *httpServer) Options() server.Options {
-	h.Lock()
-	opts := h.opts
-	h.Unlock()
+func (t *httpServer) Options() server.Options {
+	t.Lock()
+	opts := t.opts
+	t.Unlock()
 	return opts
 }
 
-func (h *httpServer) Init(opts ...server.Option) error {
-	h.Lock()
+func (t *httpServer) Init(opts ...server.Option) error {
+	t.Lock()
 	for _, o := range opts {
-		o(&h.opts)
+		o(&t.opts)
 	}
-	h.Unlock()
+	t.Unlock()
 	return nil
 }
 
-func (h *httpServer) Handle(handler server.Handler) error {
+func (t *httpServer) Handle(handler server.Handler) error {
 	if _, ok := handler.Handler().(http.Handler); !ok {
 		return errors.New("Handler requires http.Handler")
 	}
-	h.Lock()
-	h.hd = handler
-	h.Unlock()
+	t.Lock()
+	t.hd = handler
+	t.Unlock()
 	return nil
 }
 
-func (h *httpServer) NewHandler(handler interface{}, opts ...server.HandlerOption) server.Handler {
+func (t *httpServer) NewHandler(handler interface{}, opts ...server.HandlerOption) server.Handler {
 	options := server.HandlerOptions{
 		Metadata: make(map[string]map[string]string),
 	}
@@ -102,11 +103,11 @@ func (h *httpServer) NewHandler(handler interface{}, opts ...server.HandlerOptio
 	}
 }
 
-func (h *httpServer) NewSubscriber(topic string, handler interface{}, opts ...server.SubscriberOption) server.Subscriber {
+func (t *httpServer) NewSubscriber(topic string, handler interface{}, opts ...server.SubscriberOption) server.Subscriber {
 	return newSubscriber(topic, handler, opts...)
 }
 
-func (h *httpServer) Subscribe(sb server.Subscriber) error {
+func (t *httpServer) Subscribe(sb server.Subscriber) error {
 	sub, ok := sb.(*httpSubscriber)
 	if !ok {
 		return fmt.Errorf("invalid subscriber: expected *httpSubscriber")
@@ -119,28 +120,28 @@ func (h *httpServer) Subscribe(sb server.Subscriber) error {
 		return err
 	}
 
-	h.Lock()
-	defer h.Unlock()
-	_, ok = h.subscribers[sub]
+	t.Lock()
+	defer t.Unlock()
+	_, ok = t.subscribers[sub]
 	if ok {
-		return fmt.Errorf("subscriber %v already exists", h)
+		return fmt.Errorf("subscriber %v already exists", t)
 	}
-	h.subscribers[sub] = nil
+	t.subscribers[sub] = nil
 	return nil
 }
 
-func (h *httpServer) Register() error {
-	h.Lock()
-	opts := h.opts
-	eps := h.hd.Endpoints()
-	h.Unlock()
+func (t *httpServer) Register() error {
+	t.Lock()
+	opts := t.opts
+	eps := t.hd.Endpoints()
+	t.Unlock()
 
 	service := serviceDef(opts)
 	service.Endpoints = eps
 
-	h.Lock()
+	t.Lock()
 	var subscriberList []*httpSubscriber
-	for e := range h.subscribers {
+	for e := range t.subscribers {
 		// Only advertise non internal subscribers
 		if !e.Options().Internal {
 			subscriberList = append(subscriberList, e)
@@ -152,13 +153,13 @@ func (h *httpServer) Register() error {
 	for _, e := range subscriberList {
 		service.Endpoints = append(service.Endpoints, e.Endpoints()...)
 	}
-	h.Unlock()
+	t.Unlock()
 
 	rOpts := []registry.RegisterOption{
 		registry.RegisterTTL(opts.RegisterTTL),
 	}
 
-	h.registerOnce.Do(func() {
+	t.registerOnce.Do(func() {
 		log.Infof("Registering node: %s", opts.Name+"-"+opts.Id)
 	})
 
@@ -166,16 +167,16 @@ func (h *httpServer) Register() error {
 		return err
 	}
 
-	h.Lock()
-	defer h.Unlock()
+	t.Lock()
+	defer t.Unlock()
 
-	if h.registered {
+	if t.registered {
 		return nil
 	}
-	h.registered = true
+	t.registered = true
 
-	for sb, _ := range h.subscribers {
-		handler := h.createSubHandler(sb, opts)
+	for sb, _ := range t.subscribers {
+		handler := t.createSubHandler(sb, opts)
 		var subOpts []broker.SubscribeOption
 		if queue := sb.Options().Queue; len(queue) > 0 {
 			subOpts = append(subOpts, broker.Queue(queue))
@@ -184,15 +185,15 @@ func (h *httpServer) Register() error {
 		if err != nil {
 			return err
 		}
-		h.subscribers[sb] = []broker.Subscriber{sub}
+		t.subscribers[sb] = []broker.Subscriber{sub}
 	}
 	return nil
 }
 
-func (h *httpServer) Deregister() error {
-	h.Lock()
-	opts := h.opts
-	h.Unlock()
+func (t *httpServer) Deregister() error {
+	t.Lock()
+	opts := t.opts
+	t.Unlock()
 
 	log.Infof("Deregistering node: %s", opts.Name+"-"+opts.Id)
 
@@ -201,29 +202,31 @@ func (h *httpServer) Deregister() error {
 		return err
 	}
 
-	h.Lock()
-	if !h.registered {
-		h.Unlock()
+	t.Lock()
+	if !t.registered {
+		t.Unlock()
 		return nil
 	}
-	h.registered = false
+	t.registered = false
 
-	for sb, subs := range h.subscribers {
+	for sb, subs := range t.subscribers {
 		for _, sub := range subs {
 			log.Infof("Unsubscribing from topic: %s", sub.Topic())
 			sub.Unsubscribe()
 		}
-		h.subscribers[sb] = nil
+		t.subscribers[sb] = nil
 	}
-	h.Unlock()
+	t.Unlock()
 	return nil
 }
 
-func (h *httpServer) Start() error {
-	h.Lock()
-	opts := h.opts
-	hd := h.hd
-	h.Unlock()
+func (t *httpServer) Start() (err error) {
+	defer xerror.RespErr(&err)
+
+	t.Lock()
+	opts := t.opts
+	hd := t.hd
+	t.Unlock()
 
 	ln, err := net.Listen("tcp", opts.Address)
 	if err != nil {
@@ -232,9 +235,9 @@ func (h *httpServer) Start() error {
 
 	log.Infof("Listening on %s", ln.Addr().String())
 
-	h.Lock()
-	h.opts.Address = ln.Addr().String()
-	h.Unlock()
+	t.Lock()
+	t.opts.Address = ln.Addr().String()
+	t.Unlock()
 
 	handler, ok := hd.Handler().(http.Handler)
 	if !ok {
@@ -242,17 +245,17 @@ func (h *httpServer) Start() error {
 	}
 
 	// register
-	h.Register()
+	xerror.Panic(t.Register())
 
 	go http.Serve(ln, handler)
 
 	go func() {
-		t := new(time.Ticker)
+		tk := new(time.Ticker)
 
 		// only process if it exists
 		if opts.RegisterInterval > time.Duration(0) {
 			// new ticker
-			t = time.NewTicker(opts.RegisterInterval)
+			tk = time.NewTicker(opts.RegisterInterval)
 		}
 
 		// return error chan
@@ -262,12 +265,12 @@ func (h *httpServer) Start() error {
 		for {
 			select {
 			// register self on interval
-			case <-t.C:
-				if err := h.Register(); err != nil {
+			case <-tk.C:
+				if err := t.Register(); err != nil {
 					log.Infof("Server register error: %v", err)
 				}
 			// wait for exit
-			case ch = <-h.exit:
+			case ch = <-t.exit:
 				break Loop
 			}
 		}
@@ -275,7 +278,7 @@ func (h *httpServer) Start() error {
 		ch <- ln.Close()
 
 		// deregister
-		h.Deregister()
+		t.Deregister()
 
 		opts.Broker.Disconnect()
 	}()
@@ -283,13 +286,13 @@ func (h *httpServer) Start() error {
 	return opts.Broker.Connect()
 }
 
-func (h *httpServer) Stop() error {
+func (t *httpServer) Stop() error {
 	ch := make(chan error)
-	h.exit <- ch
+	t.exit <- ch
 	return <-ch
 }
 
-func (h *httpServer) String() string {
+func (t *httpServer) String() string {
 	return "http"
 }
 
