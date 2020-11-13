@@ -31,10 +31,6 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 		if opt.Name == "" || opt.Version == "" {
 			return xerror.New("neither [name] nor [version] can be empty")
 		}
-
-		cmd := ent.Options().Command
-		cmd.Version = ent.Options().Version
-		cmd.Use = ent.Options().Name
 	}
 
 	var rootCmd = &cobra.Command{Use: catdog_config.Domain, Version: version.Version}

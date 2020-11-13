@@ -2,6 +2,8 @@ package base_entry
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/server"
 	"github.com/gofiber/fiber"
@@ -16,7 +18,6 @@ import (
 	"github.com/pubgo/xlog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"strings"
 )
 
 const defaultContentType = "application/json"
@@ -27,35 +28,16 @@ type entry struct {
 	s    *entryServerWrapper
 	c    client.Client
 	opts catdog_entry.Options
-	app  *fiber.App
 }
 
 func (t *entry) Init() (err error) {
 	defer xerror.RespErr(&err)
 
-	catdog_server.Default.Server = t.s.Server
+	t.opts.Initialized = true
 	catdog_client.Default.Client = t.c
 	catdog_config.Project = t.Options().Name
+	catdog_server.Default.Server = t.s.Server
 
-	xerror.Panic(catdog_server.Default.Init(server.Name(catdog_config.Project)))
-
-	xerror.Exit(catdog_abc.WithAfterStart(func() {
-		if !catdog_config.Trace {
-			return
-		}
-
-		xlog.Debug("entry rest trace")
-		for _, stacks := range t.app.Stack() {
-			for _, stack := range stacks {
-				if stack.Path == "/" {
-					continue
-				}
-
-				log.Debugf("%s %s", stack.Method, stack.Path)
-			}
-		}
-		fmt.Println()
-	}))
 	return nil
 }
 
@@ -73,14 +55,13 @@ func (t *entry) Options() catdog_entry.Options {
 	return t.opts
 }
 
-func (t *entry) Flags(fn func(flag *pflag.FlagSet)) (err error) {
+func (t *entry) Flags(fn func(flags *pflag.FlagSet)) (err error) {
 	defer xerror.RespErr(&err)
 	fn(t.opts.Command.PersistentFlags())
 	return nil
 }
 
 func (t *entry) Description(description ...string) error {
-	t.opts.Name = t.opts.Command.Name()
 	t.opts.Command.Short = fmt.Sprintf("This is a %s service", t.opts.Name)
 
 	if len(description) > 0 {
@@ -130,21 +111,46 @@ func (t *entry) Handler(hdlr interface{}, opts ...server.HandlerOption) error {
 func newEntry(name string, srv server.Server, app *fiber.App) *entry {
 	name = strings.TrimSpace(name)
 	if name == "" {
-		xerror.Exit(xerror.New("the name parameter should not be empty"))
+		xerror.Panic(xerror.New("the [name] parameter should not be empty"))
 	}
 
+	rootCmd := &cobra.Command{Use: name}
+	runCmd := &cobra.Command{Use: "run", Short: "run as a service"}
+	rootCmd.AddCommand(runCmd)
+
 	ent := &entry{
-		app: app,
-		s:   &entryServerWrapper{Server: srv},
+		s: &entryServerWrapper{Server: srv},
 		opts: catdog_entry.Options{
-			RunCommand: &cobra.Command{Use: "run", Short: "run as a service"},
-			Command:    &cobra.Command{Use: name},
+			Name:       Name,
+			RestAddr:   ":8080",
+			RunCommand: runCmd,
+			Command:    rootCmd,
 		},
 	}
-	ent.opts.Command.AddCommand(ent.opts.RunCommand)
+
+	xerror.Panic(ent.Flags(func(flags *pflag.FlagSet) {
+		flags.StringVar(&ent.opts.RestAddr, "rest_addr", ent.opts.RestAddr, "the rest server address")
+	}))
 
 	if app != nil {
 		ent.s.router = app.Group(name)
+		xerror.Exit(catdog_abc.WithAfterStart(func() {
+			if !catdog_config.Trace || !ent.opts.Initialized {
+				return
+			}
+
+			xlog.Debug("entry rest trace")
+			for _, stacks := range app.Stack() {
+				for _, stack := range stacks {
+					if stack.Path == "/" {
+						continue
+					}
+
+					log.Debugf("%s %s", stack.Method, stack.Path)
+				}
+			}
+			fmt.Println()
+		}))
 	}
 
 	return ent

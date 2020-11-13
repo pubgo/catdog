@@ -24,7 +24,5 @@ func (t *entryServerWrapper) Handle(handler server.Handler) (err error) {
 	if handler == nil {
 		return xerror.New("[handler] should not be nil")
 	}
-
-	log.Debugf("Handle %s", handler.Name())
 	return
 }

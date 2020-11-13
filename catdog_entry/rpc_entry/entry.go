@@ -13,19 +13,16 @@ import (
 	"github.com/asim/nitro/v3/server"
 	"github.com/gofiber/fiber"
 	"github.com/gofiber/fiber/middleware"
-	"github.com/pubgo/xerror"
-	"github.com/pubgo/xprocess"
-	"github.com/spf13/pflag"
-
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/xerror"
+	"github.com/pubgo/xprocess"
 )
 
 type entry struct {
 	catdog_entry.Entry
-	c    client.Client
-	app  *fiber.App
-	addr string
+	c   client.Client
+	app *fiber.App
 }
 
 func (t *entry) Init() (err error) {
@@ -40,9 +37,12 @@ func (t *entry) Start() (err error) {
 
 	cancel := xprocess.Go(func(ctx context.Context) (err error) {
 		defer xerror.RespErr(&err)
-		log.Infof("Server [http] Listening on http://%s", t.addr)
-		xerror.Exit(t.app.Listen(t.addr))
+
+		addr := t.Options().RestAddr
+		log.Infof("Server [http] Listening on http://%s", addr)
+		xerror.Exit(t.app.Listen(addr))
 		log.Infof("Server [http] Closed OK")
+
 		return nil
 	})
 
@@ -79,15 +79,10 @@ func newEntry(name string) *entry {
 			grpc.NewServer(server.Context(context.Background()), server.Name(name)),
 			app,
 		),
-		c:    grpcC.NewClient(),
-		app:  app,
-		addr: ":8080",
+		c:   grpcC.NewClient(),
+		app: app,
 	}
 	ent.app.Use(ent.middleware()...)
-
-	xerror.Exit(ent.Flags(func(flags *pflag.FlagSet) {
-		flags.StringVar(&ent.addr, "gw_addr", ent.addr, "rpc gateway address")
-	}))
 
 	return ent
 }

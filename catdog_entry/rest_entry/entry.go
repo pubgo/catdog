@@ -25,10 +25,6 @@ type entry struct {
 	addr string
 }
 
-func (t *entry) Init() error {
-	return xerror.Wrap(t.Entry.Init())
-}
-
 func (t *entry) Start() (err error) {
 	defer xerror.RespErr(&err)
 
@@ -73,15 +69,9 @@ func newEntry(name string) *entry {
 	app := fiber.New()
 
 	ent := &entry{
-		Entry: base_entry.New(
-			name,
-			&entryServerWrapper{
-				Server: server_http.NewServer(server.Context(context.Background())),
-			},
-			app,
-		),
-		app:  app,
-		addr: ":8080",
+		Entry: base_entry.New(name, &entryServerWrapper{Server: server_http.NewServer(server.Context(context.Background()))}, app),
+		app:   app,
+		addr:  ":8080",
 	}
 	ent.app.Use(ent.middleware()...)
 
