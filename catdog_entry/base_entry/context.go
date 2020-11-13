@@ -2,6 +2,7 @@ package base_entry
 
 import (
 	"context"
+
 	"github.com/gofiber/fiber"
 )
 

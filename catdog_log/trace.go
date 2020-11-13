@@ -2,6 +2,7 @@ package catdog_log
 
 import (
 	"fmt"
+
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/xlog"
