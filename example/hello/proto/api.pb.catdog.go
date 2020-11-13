@@ -32,6 +32,134 @@ var _ context.Context
 var _ client.Option
 var _ server.Option
 
+// Client API for TestApiKind service
+type TestApiKindService interface {
+	Version11(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error)
+	VersionTest11(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error)
+}
+
+type testApiKindService struct {
+	c    client.Client
+	name string
+}
+
+func NewTestApiKindService(name string, c client.Client) TestApiKindService {
+	return &testApiKindService{
+		c:    c,
+		name: name,
+	}
+}
+func (c *testApiKindService) Version11(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
+
+	req := c.c.NewRequest(c.name, "TestApiKind.Version11", in)
+	out := new(TestApiOutput)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Stream auxiliary types and methods.
+type TestApiKind_Version11Service interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+}
+type TestApiKindVersion11 struct {
+	stream client.Stream
+}
+
+func (x *TestApiKindVersion11) Close() error {
+	return x.stream.Close()
+}
+
+func (x *TestApiKindVersion11) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *TestApiKindVersion11) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *TestApiKindVersion11) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (c *testApiKindService) VersionTest11(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error) {
+
+	req := c.c.NewRequest(c.name, "TestApiKind.VersionTest11", in)
+	out := new(TestApiOutput)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Stream auxiliary types and methods.
+type TestApiKind_VersionTest11Service interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+}
+type TestApiKindVersionTest11 struct {
+	stream client.Stream
+}
+
+func (x *TestApiKindVersionTest11) Close() error {
+	return x.stream.Close()
+}
+
+func (x *TestApiKindVersionTest11) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *TestApiKindVersionTest11) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *TestApiKindVersionTest11) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+// Server API for TestApiKind service
+type TestApiKindHandler interface {
+	Version11(context.Context, *TestReq, *TestApiOutput) error
+	VersionTest11(context.Context, *TestReq, *TestApiOutput) error
+}
+
+func RegisterTestApiKindHandler(s server.Server, hdlr TestApiKindHandler, opts ...server.HandlerOption) error {
+	type testApiKind interface {
+		Version11(ctx context.Context, in *TestReq, out *TestApiOutput) error
+		VersionTest11(ctx context.Context, in *TestReq, out *TestApiOutput) error
+	}
+
+	type TestApiKind struct {
+		testApiKind
+	}
+	h := &testApiKindHandler{hdlr}
+	opts = append(opts, server.EndpointMetadata("Version11", map[string]string{"ws": "/v1/example/versiontest"}))
+	opts = append(opts, server.EndpointMetadata("VersionTest11", map[string]string{"test": "/v1/example/versiontest"}))
+	return s.Handle(s.NewHandler(&TestApiKind{h}, opts...))
+}
+
+func init() { catdog_data.Add("RegisterTestApiKindHandler", RegisterTestApiKindHandler) }
+
+type testApiKindHandler struct {
+	TestApiKindHandler
+}
+
+func (h *testApiKindHandler) Version11(ctx context.Context, in *TestReq, out *TestApiOutput) error {
+	return h.TestApiKindHandler.Version11(ctx, in, out)
+}
+
+func (h *testApiKindHandler) VersionTest11(ctx context.Context, in *TestReq, out *TestApiOutput) error {
+	return h.TestApiKindHandler.VersionTest11(ctx, in, out)
+}
+
 // Client API for TestApi service
 type TestApiService interface {
 	Version(ctx context.Context, in *TestReq, opts ...client.CallOption) (*TestApiOutput, error)

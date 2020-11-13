@@ -5,6 +5,23 @@ package helloworld;
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
+service TestApiKind {
+  rpc Version11(TestReq) returns (TestApiOutput){
+    option (google.api.http) = {
+      custom: {kind:"ws",path:"/v1/example/versiontest"}
+      body: "*"
+    };
+  }
+
+  rpc VersionTest11(TestReq) returns (TestApiOutput){
+    option (google.api.http) = {
+      custom: {kind:"test",path:"/v1/example/versiontest"}
+      body: "*"
+    };
+  }
+}
+
+
 service TestApi {
   rpc Version(TestReq) returns (TestApiOutput){
     option (google.api.http) = {

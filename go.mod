@@ -10,10 +10,12 @@ require (
 	github.com/asim/nitro-plugins/server/grpc/v3 v3.3.1-0.20201031120104-4c96a26220fa
 	github.com/asim/nitro/v3 v3.3.0
 	github.com/dave/jennifer v1.4.0
+	github.com/fasthttp/websocket v1.4.3
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/gofiber/fiber v1.14.5
+	github.com/gofiber/fiber/v2 v2.1.4
+	github.com/gofiber/websocket/v2 v2.0.2
 	github.com/gogo/protobuf v1.3.1
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/golang/protobuf v1.4.3

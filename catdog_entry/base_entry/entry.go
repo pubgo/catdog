@@ -3,19 +3,19 @@ package base_entry
 import (
 	"context"
 	"fmt"
+	"github.com/pubgo/catdog/plugins/catdog_client"
+	"github.com/pubgo/catdog/plugins/catdog_server"
 	"net/http"
 	"strings"
 
 	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/server"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	ver "github.com/hashicorp/go-version"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/internal/catdog_abc"
-	"github.com/pubgo/catdog/plugins/catdog_client"
-	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
@@ -23,23 +23,16 @@ import (
 	"github.com/spf13/pflag"
 )
 
-const defaultContentType = "application/json"
-
 var _ catdog_entry.Entry = (*entry)(nil)
 
 type entry struct {
-	s    *entryServerWrapper
+	s    server.Server
 	c    client.Client
 	opts catdog_entry.Options
 }
 
 func (t *entry) Init() (err error) {
 	defer xerror.RespErr(&err)
-
-	t.opts.Initialized = true
-	catdog_client.Default.Client = t.c
-	catdog_config.Project = t.Options().Name
-	catdog_server.Default.Server = t.s.Server
 
 	xerror.Exit(catdog_abc.WithAfterStart(func() {
 		if !catdog_config.Trace || !t.opts.Initialized {
@@ -58,6 +51,11 @@ func (t *entry) Init() (err error) {
 		}
 		fmt.Println()
 	}))
+
+	t.opts.Initialized = true
+	catdog_client.Default.Client = t.c
+	catdog_config.Project = t.Options().Name
+	catdog_server.Default.Server = t.s
 
 	return nil
 }
@@ -123,6 +121,7 @@ func (t *entry) Version(v string) error {
 		return xerror.New("[version] should not be null")
 	}
 
+	t.opts.Command.Version = v
 	_, err := ver.NewVersion(v)
 	return xerror.WrapF(err, "[v] version format error")
 }
@@ -158,11 +157,15 @@ func newEntry(name string, srv server.Server) *entry {
 	runCmd := &cobra.Command{Use: "run", Short: "run as a service"}
 	rootCmd.AddCommand(runCmd)
 
-	app := fiber.New()
+	xerror.Panic(srv.Init(
+		server.Name(name),
+		server.Context(context.Background()),
+	))
+
 	ent := &entry{
-		s: &entryServerWrapper{Server: srv, router: app.Group(name)},
+		s: srv,
 		opts: catdog_entry.Options{
-			App:        app,
+			App:        fiber.New(),
 			Name:       Name,
 			RestAddr:   ":8080",
 			RunCommand: runCmd,
