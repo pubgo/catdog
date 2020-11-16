@@ -11,8 +11,10 @@ import (
 
 func trace(cfg xlog_config.Config) {
 	if catdog_config.Trace {
-		xlog.Debug("log trace")
-		fmt.Println(catdog_util.MarshalIndent(cfg))
-		fmt.Println()
+		return
 	}
+
+	xlog.Debug("log trace")
+	fmt.Println(catdog_util.MarshalIndent(cfg))
+	fmt.Println()
 }

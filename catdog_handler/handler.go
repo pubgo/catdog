@@ -31,7 +31,7 @@ func Register(s server.Server, hdlr interface{}, opts ...server.HandlerOption) (
 	}
 
 	var vRegister reflect.Value
-	hd := reflect.New(unWrapType(reflect.TypeOf(hdlr))).Type()
+	hd := reflect.New(reflect.Indirect(reflect.ValueOf(hdlr)).Type()).Type()
 	for _, v := range catdog_data.List() {
 		v1 := reflect.TypeOf(v)
 		if v1.NumIn() < 2 {
@@ -63,24 +63,9 @@ func Register(s server.Server, hdlr interface{}, opts ...server.HandlerOption) (
 	for _, opt := range opts {
 		sOpts = append(sOpts, reflect.ValueOf(opt))
 	}
+
 	if ret := vRegister.Call(sOpts); !ret[0].IsNil() {
 		return xerror.WrapF(ret[0].Interface().(error), "%v, %v", vHandler.Type(), vRegister.Type())
 	}
 	return
-}
-
-func unWrapType(tye reflect.Type) reflect.Type {
-	for isElem(tye) {
-		tye = tye.Elem()
-	}
-	return tye
-}
-
-func isElem(tye reflect.Type) bool {
-	switch tye.Kind() {
-	case reflect.Chan, reflect.Map, reflect.Ptr, reflect.Array, reflect.Slice:
-		return true
-	default:
-		return false
-	}
 }

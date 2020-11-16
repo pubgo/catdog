@@ -3,12 +3,9 @@ package base_entry
 import (
 	"context"
 	"fmt"
-	"github.com/pubgo/catdog/plugins/catdog_client"
-	"github.com/pubgo/catdog/plugins/catdog_server"
 	"net/http"
 	"strings"
 
-	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/server"
 	"github.com/gofiber/fiber/v2"
 	ver "github.com/hashicorp/go-version"
@@ -16,6 +13,7 @@ import (
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
@@ -26,8 +24,7 @@ import (
 var _ catdog_entry.Entry = (*entry)(nil)
 
 type entry struct {
-	s    server.Server
-	c    client.Client
+	s    *entryServerWrapper
 	opts catdog_entry.Options
 }
 
@@ -53,9 +50,8 @@ func (t *entry) Init() (err error) {
 	}))
 
 	t.opts.Initialized = true
-	catdog_client.Default.Client = t.c
 	catdog_config.Project = t.Options().Name
-	catdog_server.Default.Server = t.s
+	catdog_server.Default.Server = t.s.Server
 
 	return nil
 }
@@ -162,10 +158,11 @@ func newEntry(name string, srv server.Server) *entry {
 		server.Context(context.Background()),
 	))
 
+	app := fiber.New()
 	ent := &entry{
-		s: srv,
+		s: &entryServerWrapper{Server: srv, router: app.Group(name)},
 		opts: catdog_entry.Options{
-			App:        fiber.New(),
+			App:        app,
 			Name:       Name,
 			RestAddr:   ":8080",
 			RunCommand: runCmd,

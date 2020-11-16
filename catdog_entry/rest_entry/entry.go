@@ -13,9 +13,7 @@ type entry struct {
 }
 
 func newEntry(name string) *entry {
-	s := &entryServerWrapper{Server: server_http.NewServer()}
-	ent := &entry{Entry: base_entry.New(name, s)}
-	s.router = ent.Options().App
+	ent := &entry{Entry: base_entry.New(name, &entryServerWrapper{Server: server_http.NewServer()})}
 	return ent
 }
 

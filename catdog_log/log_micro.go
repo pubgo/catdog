@@ -56,21 +56,23 @@ func (h *microLogger) Fields(fields map[string]interface{}) logger.Logger {
 	h.Lock()
 	defer h.Unlock()
 
-	if fields != nil {
-		opts := h.opts
-		if opts.Fields == nil {
-			opts.Fields = make(map[string]interface{})
-		}
+	if fields == nil || len(fields) == 0 {
+		return h
+	}
 
-		var logFields []xlog.Field
-		for k, v := range fields {
-			logFields = append(logFields, xlog.Any(k, v))
-			opts.Fields[k] = v
-		}
+	opts := h.opts
+	if opts.Fields == nil {
+		opts.Fields = make(map[string]interface{})
+	}
 
-		if len(logFields) > 0 {
-			return &microLogger{log: h.log.With(logFields...), opts: opts}
-		}
+	var logFields []xlog.Field
+	for k, v := range fields {
+		logFields = append(logFields, xlog.Any(k, v))
+		opts.Fields[k] = v
+	}
+
+	if len(logFields) > 0 {
+		return &microLogger{log: h.log.With(logFields...), opts: opts}
 	}
 
 	return h
@@ -96,6 +98,7 @@ func (h *microLogger) Log(level logger.Level, v ...interface{}) {
 
 func (h *microLogger) Logf(level logger.Level, format string, v ...interface{}) {
 	log := h.log
+
 	switch level {
 	case logger.TraceLevel:
 		log.Debug(fmt.Sprintf(format, v...))

@@ -28,9 +28,9 @@ func initLog(cfg xlog_config.Config) (err error) {
 func init() {
 	var config = xlog_config.NewDevConfig()
 	xerror.Exit(catdog_plugin.Register(&catdog_plugin.Base{
-		Name: "log",
+		Name: "catdog_log",
 		OnFlags: func(flags *pflag.FlagSet) {
-			flags.StringVar(&config.Level, "log_level", config.Level, "log level")
+			flags.StringVar(&config.Level, "level", config.Level, "log level")
 		},
 		OnInit: func(r reader.Value) {
 			xerror.Panic(r.Scan(&config))

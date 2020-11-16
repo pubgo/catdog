@@ -24,7 +24,7 @@ func HttpMiddleware(fn server.HandlerFunc) func(*fiber.Ctx) {
 		})
 
 		s, m := apiRoute(ctx.OriginalURL())
-		request := &httpRequest{
+		request := &Request{
 			service:     fmt.Sprintf("%s.%s", catdog_config.Project, s),
 			contentType: defaultContentType,
 			method:      m,
@@ -46,7 +46,7 @@ func HttpMiddleware1(fn server.HandlerWrapper) func(*fiber.Ctx) {
 		})
 
 		s, m := apiRoute(ctx.OriginalURL())
-		request := &httpRequest{
+		request := &Request{
 			service:     fmt.Sprintf("%s.%s", catdog_config.Project, s),
 			contentType: defaultContentType,
 			method:      m,

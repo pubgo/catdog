@@ -11,6 +11,7 @@ type httpRequest struct {
 	header      map[string]string
 	body        []byte
 	stream      bool
+	endpoint    string
 }
 
 func (r *httpRequest) ContentType() string {
@@ -26,7 +27,7 @@ func (r *httpRequest) Method() string {
 }
 
 func (r *httpRequest) Endpoint() string {
-	return r.method
+	return r.endpoint
 }
 
 func (r *httpRequest) Codec() codec.Reader {

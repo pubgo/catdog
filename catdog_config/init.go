@@ -20,6 +20,7 @@ import (
 
 func Init() (err error) {
 	defer xerror.RespErr(&err)
+
 	// 从环境变量中获取系统默认值
 	// 获取系统默认的前缀, 环境变量前缀等
 	catdog_env.Get(&Domain, "catdog", "catdog_domain", "catdog_prefix", "env_prefix")

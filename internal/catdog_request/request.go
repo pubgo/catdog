@@ -4,7 +4,7 @@ import (
 	"github.com/asim/nitro/v3/codec"
 )
 
-type httpRequest struct {
+type Request struct {
 	service     string
 	method      string
 	contentType string
@@ -13,38 +13,38 @@ type httpRequest struct {
 	stream      bool
 }
 
-func (r *httpRequest) ContentType() string {
+func (r *Request) ContentType() string {
 	return r.contentType
 }
 
-func (r *httpRequest) Service() string {
+func (r *Request) Service() string {
 	return r.service
 }
 
-func (r *httpRequest) Method() string {
+func (r *Request) Method() string {
 	return r.method
 }
 
-func (r *httpRequest) Endpoint() string {
+func (r *Request) Endpoint() string {
 	return r.method
 }
 
-func (r *httpRequest) Codec() codec.Reader {
+func (r *Request) Codec() codec.Reader {
 	return nil
 }
 
-func (r *httpRequest) Header() map[string]string {
+func (r *Request) Header() map[string]string {
 	return r.header
 }
 
-func (r *httpRequest) Read() ([]byte, error) {
+func (r *Request) Read() ([]byte, error) {
 	return r.body, nil
 }
 
-func (r *httpRequest) Stream() bool {
+func (r *Request) Stream() bool {
 	return r.stream
 }
 
-func (r *httpRequest) Body() interface{} {
+func (r *Request) Body() interface{} {
 	return r.body
 }

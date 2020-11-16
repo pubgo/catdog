@@ -1,4 +1,4 @@
-package ws_entry
+package base_entry
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type fastHttpRequest1 struct{}
+type fastHttpRequest struct{}
 
 func RequestFromCtx(ctx context.Context) *fiber.Ctx {
 	ret := ctx.Value(fastHttpRequest{})
@@ -14,4 +14,12 @@ func RequestFromCtx(ctx context.Context) *fiber.Ctx {
 		return nil
 	}
 	return ret.(*fiber.Ctx)
+}
+
+func RequestBackFromCtx(ctx context.Context, fn func(*fiber.Ctx)) {
+	ret := ctx.Value(fastHttpRequest{})
+	if ret == nil {
+		return
+	}
+	fn(ret.(*fiber.Ctx))
 }

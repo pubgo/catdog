@@ -3,6 +3,7 @@ package catdog_entry
 import (
 	"github.com/asim/nitro/v3/server"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pubgo/catdog/catdog_entry/base_entry"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -37,3 +38,5 @@ type Options struct {
 	RunCommand  *cobra.Command
 	Command     *cobra.Command
 }
+
+var RequestFromCtx = base_entry.RequestFromCtx
