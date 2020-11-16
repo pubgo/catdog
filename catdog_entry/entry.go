@@ -7,14 +7,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type RestEntry interface {
-	Entry
-}
-
-type RpcEntry interface {
-	Entry
-}
-
 type Entry interface {
 	Init() error
 	Start() error

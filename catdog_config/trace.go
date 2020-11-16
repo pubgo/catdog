@@ -3,11 +3,11 @@ package catdog_config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pubgo/dix/dix_run"
 	"os"
 	"strings"
 
 	"github.com/pubgo/catdog/catdog_util"
-	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -16,7 +16,7 @@ import (
 
 func init() {
 	// debug and trace
-	xerror.Exit(catdog_action.WithAfterStart(func() {
+	xerror.Exit(dix_run.WithAfterStart(func(ctx *dix_run.AfterStartCtx) {
 		if !Trace {
 			return
 		}
@@ -32,10 +32,6 @@ func init() {
 
 		xlog.Debug("deps trace")
 		fmt.Println(dix.Graph())
-		fmt.Println()
-
-		xlog.Debug("run action trace")
-		catdog_action.Trace()
 		fmt.Println()
 
 		xlog.Debug("goroutine trace")

@@ -7,7 +7,6 @@ import (
 	"github.com/asim/nitro/v3/client"
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/asim/nitro/v3/server"
-	"github.com/pubgo/catdog/internal/catdog_request"
 	"github.com/pubgo/catdog/plugins/catdog_client"
 	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/catdog/plugins/catdog_tracing/tracing"
@@ -17,10 +16,6 @@ import (
 
 	"github.com/pubgo/catdog/catdog_plugin"
 )
-
-func init() {
-	catdog_request.HttpMiddleware(Recovery)
-}
 
 func Recovery(ctx context.Context, req server.Request, rsp interface{}) error {
 	t := time.Now()
@@ -62,6 +57,7 @@ func Recovery(ctx context.Context, req server.Request, rsp interface{}) error {
 	if err := recover(); err != nil {
 		xlog.Errorf("Call service error: %v", err)
 	}
+	return nil
 }
 
 func init() {

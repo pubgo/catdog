@@ -3,6 +3,7 @@ package base_entry
 import (
 	"context"
 	"fmt"
+	"github.com/pubgo/dix/dix_run"
 	"net/http"
 	"strings"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
-	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -31,7 +31,7 @@ type entry struct {
 func (t *entry) Init() (err error) {
 	defer xerror.RespErr(&err)
 
-	xerror.Panic(catdog_action.WithAfterStart(func() {
+	xerror.Panic(dix_run.WithAfterStart(func(ctx *dix_run.AfterStartCtx) {
 		if !catdog_config.Trace || !t.opts.Initialized {
 			return
 		}
@@ -70,7 +70,7 @@ func (t *entry) Start() (err error) {
 		return nil
 	})
 
-	xerror.Panic(catdog_action.WithBeforeStop(func() {
+	xerror.Panic(dix_run.WithBeforeStop(func(ctx *dix_run.BeforeStopCtx) {
 		xerror.Panic(cancel())
 		if err := t.opts.App.Shutdown(); err != nil && err != http.ErrServerClosed {
 			fmt.Println(xerror.Parse(err).Println())
@@ -181,3 +181,5 @@ func newEntry(name string, srv server.Server) *entry {
 func New(name string, srv server.Server) catdog_entry.Entry {
 	return newEntry(name, srv)
 }
+
+//"#${pid} - ${time} ${status} - ${latency} ${method} ${path}\n"

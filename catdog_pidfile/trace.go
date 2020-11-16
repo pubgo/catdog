@@ -3,13 +3,13 @@ package catdog_pidfile
 import (
 	"fmt"
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/internal/catdog_action"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 )
 
 func init() {
-	xerror.Exit(catdog_action.WithAfterStart(func() {
+	xerror.Exit(dix_run.WithAfterStart(func(ctx *dix_run.AfterStartCtx) {
 		if !catdog_config.Trace {
 			return
 		}

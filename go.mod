@@ -15,7 +15,6 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/gofiber/fiber/v2 v2.1.4
-	github.com/gofiber/websocket/v2 v2.0.2
 	github.com/gogo/protobuf v1.3.1
 	github.com/gojektech/heimdall v5.0.2+incompatible
 	github.com/golang/protobuf v1.4.3
@@ -23,7 +22,7 @@ require (
 	github.com/imdario/mergo v0.3.9
 	github.com/jaegertracing/jaeger v1.19.2
 	github.com/opentracing/opentracing-go v1.1.0
-	github.com/pubgo/dix v0.1.0
+	github.com/pubgo/dix v0.1.2
 	github.com/pubgo/xerror v0.2.12
 	github.com/pubgo/xlog v0.0.10
 	github.com/pubgo/xprocess v0.0.3
@@ -32,6 +31,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
+	github.com/valyala/fasthttp v1.17.0
 	go.mongodb.org/mongo-driver v1.3.2
 	go.uber.org/zap v1.16.0
 	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154

@@ -1,7 +1,7 @@
 package catdog_config
 
 import (
-	"github.com/pubgo/catdog/internal/catdog_action"
+	"github.com/pubgo/dix/dix_run"
 	"path/filepath"
 	"strings"
 
@@ -58,7 +58,7 @@ func Init() (err error) {
 	}
 
 	// 运行环境检查
-	xerror.Panic(catdog_action.WithBeforeStart(func() {
+	xerror.Panic(dix_run.WithBeforeStart(func(ctx *dix_run.BeforeStartCtx) {
 		var m = RunMode
 		switch Mode {
 		case m.Dev, m.Stag, m.Prod, m.Test, m.Release:

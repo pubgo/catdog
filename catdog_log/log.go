@@ -22,7 +22,5 @@ func GetDevLog() xlog.XLog {
 
 func Watch(fn func(logs xlog.XLog)) error {
 	fn(GetDevLog())
-	return xerror.Wrap(dix.Dix(func(logs xlog.XLog) {
-		fn(logs)
-	}))
+	return xerror.Wrap(dix.Dix(fn))
 }

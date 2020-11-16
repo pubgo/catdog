@@ -25,10 +25,10 @@ func Init() (err error) {
 
 type Entry = catdog_entry.Entry
 
-func NewRpcEntry(name string) catdog_entry.RpcEntry {
+func NewRpcEntry(name string) catdog_entry.Entry {
 	return rpc_entry.New(name)
 }
 
-func NewRestEntry(name string) catdog_entry.RestEntry {
+func NewRestEntry(name string) catdog_entry.Entry {
 	return rest_entry.New(name)
 }

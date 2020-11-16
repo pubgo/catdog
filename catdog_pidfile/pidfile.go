@@ -2,13 +2,13 @@ package catdog_pidfile
 
 import (
 	"github.com/pubgo/catdog/catdog_util"
+	"github.com/pubgo/dix/dix_run"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/xerror"
 )
 
@@ -35,7 +35,7 @@ func GetPidPath() string {
 
 func init() {
 	// 检查存放pid的目录是否存在, 不存在就创建
-	xerror.Panic(catdog_action.WithBeforeStart(func() {
+	xerror.Panic(dix_run.WithBeforeStart(func(ctx *dix_run.BeforeStartCtx) {
 		pidPath := filepath.Dir(GetPidPath())
 		if !catdog_util.PathExist(pidPath) {
 			xerror.Exit(os.MkdirAll(pidPath, pidPerm))
@@ -43,7 +43,7 @@ func init() {
 	}))
 
 	// 保存pid到文件当中
-	xerror.Panic(catdog_action.WithAfterStart(func() {
+	xerror.Panic(dix_run.WithAfterStart(func(ctx *dix_run.AfterStartCtx) {
 		xerror.Panic(SavePid())
 	}))
 }

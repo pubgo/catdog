@@ -13,8 +13,6 @@ type entry struct {
 	c client.Client
 }
 
-//"#${pid} - ${time} ${status} - ${latency} ${method} ${path}\n"
-
 func newEntry(name string) *entry {
 	ent := &entry{
 		Entry: base_entry.New(
