@@ -1,7 +1,7 @@
 package catdog_config
 
 import (
-	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/internal/catdog_action"
 	"path/filepath"
 	"strings"
 
@@ -39,13 +39,13 @@ func Init() (err error) {
 
 	CfgPath = filepath.Join(Home, "config", "config.yaml")
 	if !catdog_util.PathExist(Home) {
-		xerror.Exit(xerror.Fmt("home path [%s] not exists", Home))
+		xerror.Panic(xerror.Fmt("home path [%s] not exists", Home))
 	}
 	if !catdog_util.PathExist(CfgPath) {
-		xerror.Exit(xerror.Fmt("config path [%s] not exists", CfgPath))
+		xerror.Panic(xerror.Fmt("config path [%s] not exists", CfgPath))
 	}
 
-	cfg = &Config{Config: xerror.ExitErr(memory.NewConfig(
+	cfg = &Config{Config: xerror.PanicErr(memory.NewConfig(
 		// 加载env source
 		config.WithSource(mEnv.NewSource(mEnv.WithStrippedPrefix(Domain))),
 		// 加载file source
@@ -58,12 +58,12 @@ func Init() (err error) {
 	}
 
 	// 运行环境检查
-	xerror.Exit(catdog_abc.WithBeforeStart(func() {
+	xerror.Panic(catdog_action.WithBeforeStart(func() {
 		var m = RunMode
 		switch Mode {
 		case m.Dev, m.Stag, m.Prod, m.Test, m.Release:
 		default:
-			xerror.Exit(xerror.Fmt("running mode does not match, mode: %s", Mode))
+			xerror.Panic(xerror.Fmt("running mode does not match, mode: %s", Mode))
 		}
 	}))
 	return nil

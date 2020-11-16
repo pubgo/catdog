@@ -12,7 +12,7 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
-	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -31,7 +31,7 @@ type entry struct {
 func (t *entry) Init() (err error) {
 	defer xerror.RespErr(&err)
 
-	xerror.Exit(catdog_abc.WithAfterStart(func() {
+	xerror.Panic(catdog_action.WithAfterStart(func() {
 		if !catdog_config.Trace || !t.opts.Initialized {
 			return
 		}
@@ -64,13 +64,13 @@ func (t *entry) Start() (err error) {
 
 		addr := t.Options().RestAddr
 		log.Infof("Server [http] Listening on http://%s", addr)
-		xerror.Exit(t.opts.App.Listen(addr))
+		xerror.Panic(t.opts.App.Listen(addr))
 		log.Infof("Server [http] Closed OK")
 
 		return nil
 	})
 
-	xerror.Exit(catdog_abc.WithBeforeStop(func() {
+	xerror.Panic(catdog_action.WithBeforeStop(func() {
 		xerror.Panic(cancel())
 		if err := t.opts.App.Shutdown(); err != nil && err != http.ErrServerClosed {
 			fmt.Println(xerror.Parse(err).Println())
@@ -149,14 +149,15 @@ func newEntry(name string, srv server.Server) *entry {
 		xerror.Panic(xerror.New("the [name] parameter should not be empty"))
 	}
 
-	rootCmd := &cobra.Command{Use: name}
-	runCmd := &cobra.Command{Use: "run", Short: "run as a service"}
-	rootCmd.AddCommand(runCmd)
-
+	catdog_server.Default.Server = srv
 	xerror.Panic(srv.Init(
 		server.Name(name),
 		server.Context(context.Background()),
 	))
+
+	rootCmd := &cobra.Command{Use: name}
+	runCmd := &cobra.Command{Use: "run", Short: "run as a service"}
+	rootCmd.AddCommand(runCmd)
 
 	app := fiber.New()
 	ent := &entry{

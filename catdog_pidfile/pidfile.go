@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/xerror"
 )
 
@@ -35,7 +35,7 @@ func GetPidPath() string {
 
 func init() {
 	// 检查存放pid的目录是否存在, 不存在就创建
-	xerror.Panic(catdog_abc.WithBeforeStart(func() {
+	xerror.Panic(catdog_action.WithBeforeStart(func() {
 		pidPath := filepath.Dir(GetPidPath())
 		if !catdog_util.PathExist(pidPath) {
 			xerror.Exit(os.MkdirAll(pidPath, pidPerm))
@@ -43,9 +43,7 @@ func init() {
 	}))
 
 	// 保存pid到文件当中
-	xerror.Panic(catdog_abc.WithAfterStart(func() {
+	xerror.Panic(catdog_action.WithAfterStart(func() {
 		xerror.Panic(SavePid())
 	}))
 }
-
-func Init() {}

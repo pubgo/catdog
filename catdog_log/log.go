@@ -13,7 +13,7 @@ import (
 func GetDevLog() xlog.XLog {
 	zl, err := xlog_config.NewZapLoggerFromConfig(xlog_config.NewDevConfig())
 	if err != nil {
-		xerror.Exit(err)
+		xerror.Panic(err)
 	}
 
 	zl = zl.WithOptions(zap.AddCaller(), zap.AddCallerSkip(1)).Named(catdog_config.Project)

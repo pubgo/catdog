@@ -32,7 +32,7 @@ func List() map[string]M {
 	ms := make(map[string]M)
 	versions.Range(func(key, value interface{}) bool {
 		var v M
-		xerror.Exit(mergo.Map(&v, value))
+		xerror.Panic(mergo.Map(&v, value))
 		ms[key.(string)] = v
 		return true
 	})

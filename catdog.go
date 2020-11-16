@@ -6,7 +6,6 @@ import (
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_entry/rest_entry"
 	"github.com/pubgo/catdog/catdog_entry/rpc_entry"
-	"github.com/pubgo/catdog/catdog_pidfile"
 	"github.com/pubgo/xerror"
 )
 
@@ -18,7 +17,6 @@ func Run(entries ...Entry) (err error) {
 
 func Init() (err error) {
 	defer xerror.RespErr(&err)
-	catdog_pidfile.Init()
 
 	// 初始化配置文件
 	xerror.Panic(catdog_config.Init())

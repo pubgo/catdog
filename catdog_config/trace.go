@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/pubgo/catdog/catdog_util"
-	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -16,7 +16,7 @@ import (
 
 func init() {
 	// debug and trace
-	xerror.Exit(catdog_abc.WithAfterStart(func() {
+	xerror.Exit(catdog_action.WithAfterStart(func() {
 		if !Trace {
 			return
 		}
@@ -34,8 +34,8 @@ func init() {
 		fmt.Println(dix.Graph())
 		fmt.Println()
 
-		xlog.Debug("start trace")
-		catdog_abc.Trace()
+		xlog.Debug("run action trace")
+		catdog_action.Trace()
 		fmt.Println()
 
 		xlog.Debug("goroutine trace")

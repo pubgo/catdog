@@ -8,7 +8,7 @@ import (
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_config"
-	"github.com/pubgo/catdog/internal/catdog_abc"
+	"github.com/pubgo/catdog/internal/catdog_action"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
@@ -16,7 +16,7 @@ import (
 
 func init() {
 	// 检查是否有watcher
-	xerror.Exit(catdog_abc.WithBeforeStart(func() {
+	xerror.Exit(catdog_action.WithBeforeStart(func() {
 		// 获取
 		cfg := catdog_config.GetCfg()
 		_, err := cfg.Load("watcher")
@@ -52,7 +52,7 @@ func Watch(name string, watcher func(r reader.Value) error) error {
 		return xerror.Fmt("[watcher] should not be nil")
 	}
 
-	return xerror.Wrap(catdog_abc.WithBeforeStart(func() {
+	return xerror.Wrap(catdog_action.WithBeforeStart(func() {
 		key := strings.Join([]string{catdog_config.Project, name}, ".")
 
 		xlog.Debugf("Start Watch Config, Key: %s", key)
@@ -82,6 +82,6 @@ func Watch(name string, watcher func(r reader.Value) error) error {
 		})
 
 		// 关闭监听配置变化
-		xerror.Exit(catdog_abc.WithAfterStart(func() { xerror.Exit(cancel()) }))
+		xerror.Exit(catdog_action.WithAfterStart(func() { xerror.Exit(cancel()) }))
 	}))
 }

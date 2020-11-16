@@ -1,11 +1,7 @@
-package catdog_abc
+package catdog_action
 
 import (
-	"bytes"
-	"fmt"
-	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/xerror"
-	"github.com/pubgo/xlog"
 	"sync"
 )
 
@@ -38,30 +34,6 @@ func GetAfterStop() []func() {
 	return data
 }
 
-func Trace() {
-	var buf = bytes.NewBuffer(nil)
-	xlog.Debug("beforeStart trace")
-	for _, fn := range GetBeforeStart() {
-		buf.WriteString(xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
-		buf.WriteRune('\n')
-	}
-	xlog.Debug("afterStart trace")
-	for _, fn := range GetAfterStop() {
-		buf.WriteString(xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
-		buf.WriteRune('\n')
-	}
-	xlog.Debug("beforeStop trace")
-	for _, fn := range GetBeforeStop() {
-		buf.WriteString(xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
-		buf.WriteRune('\n')
-	}
-	xlog.Debug("afterStop trace")
-	for _, fn := range GetAfterStop() {
-		buf.WriteString(xerror.PanicStr(catdog_util.CallerWithFunc(fn)))
-	}
-	fmt.Println(buf.String())
-}
-
 var mu sync.Mutex
 
 func mutex(fn func()) {
@@ -70,22 +42,26 @@ func mutex(fn func()) {
 	fn()
 }
 
-func WithBeforeStart(fn func()) error {
+func WithBeforeStart(fn func()) (err error) {
+	defer xerror.RespErr(&err)
 	mutex(func() { beforeStart = append(beforeStart, fn) })
 	return nil
 }
 
-func WithAfterStart(fn func()) error {
+func WithAfterStart(fn func()) (err error) {
+	defer xerror.RespErr(&err)
 	mutex(func() { afterStart = append(afterStart, fn) })
 	return nil
 }
 
-func WithBeforeStop(fn func()) error {
+func WithBeforeStop(fn func()) (err error) {
+	defer xerror.RespErr(&err)
 	mutex(func() { beforeStop = append(beforeStop, fn) })
 	return nil
 }
 
-func WithAfterStop(fn func()) error {
+func WithAfterStop(fn func()) (err error) {
+	defer xerror.RespErr(&err)
 	mutex(func() { afterStop = append(afterStop, fn) })
 	return nil
 }

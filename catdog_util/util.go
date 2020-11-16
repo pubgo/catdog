@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/pubgo/xerror"
 	"os"
-	"path/filepath"
 	"reflect"
 )
 
@@ -17,8 +16,8 @@ func JsonDiff(src, target string, depth uint) []string {
 
 	var srcObj map[string]interface{}
 	var targetObj map[string]interface{}
-	xerror.Exit(json.Unmarshal([]byte(src), &srcObj))
-	xerror.Exit(json.Unmarshal([]byte(target), &targetObj))
+	xerror.Panic(json.Unmarshal([]byte(src), &srcObj))
+	xerror.Panic(json.Unmarshal([]byte(target), &targetObj))
 	srcKV := Json2KV(srcObj, depth)
 	targetKV := Json2KV(targetObj, depth)
 	for k, v := range targetKV {
@@ -64,10 +63,6 @@ func Json2KV(obj interface{}, depth uint) map[string]interface{} {
 		return map[string]interface{}{"": rObj.Interface()}
 	}
 	return data
-}
-
-func GetBinName() string {
-	return filepath.Base(os.Args[0])
 }
 
 func PathExist(path string) bool {
