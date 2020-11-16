@@ -30,7 +30,7 @@ func (p *Base) Init(r reader.Value) (err error) {
 		status = "enabled"
 	}
 
-	xlog.Debugf("[%s] init, status: %s", p.Name, status)
+	xlog.Debugf("plugin [%s] init, status: %s", p.Name, status)
 
 	if !p.Enabled {
 		return nil

@@ -34,6 +34,10 @@ func init() {
 		fmt.Println(dix.Graph())
 		fmt.Println()
 
+		xlog.Debug("start trace")
+		catdog_abc.Trace()
+		fmt.Println()
+
 		xlog.Debug("goroutine trace")
 		data = make(map[string]interface{})
 		xerror.Panic(json.Unmarshal([]byte(xprocess.Stack()), &data))

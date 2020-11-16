@@ -18,3 +18,11 @@ func (t *entryServerWrapper) Stop() (err error) {
 	defer xerror.RespErr(&err)
 	return nil
 }
+
+func (t *entryServerWrapper) Handle(handler server.Handler) (err error) {
+	if handler == nil {
+		return xerror.New("[handler] should not be nil")
+	}
+
+	return nil
+}

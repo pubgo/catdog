@@ -1,7 +1,7 @@
 package catdog_app
 
 import (
-	"github.com/pubgo/dix"
+	"github.com/pubgo/catdog/internal/catdog_abc"
 	"github.com/pubgo/xerror"
 
 	"github.com/pubgo/catdog/catdog_config"
@@ -28,9 +28,13 @@ func Start(ent catdog_entry.Entry) (err error) {
 		}
 	}
 
-	xerror.Panic(dix.BeforeStart())
+	for _, fn := range catdog_abc.GetBeforeStart() {
+		fn()
+	}
 	xerror.Panic(ent.Start())
-	xerror.Panic(dix.AfterStart())
+	for _, fn := range catdog_abc.GetAfterStart() {
+		fn()
+	}
 
 	return
 }
@@ -38,9 +42,13 @@ func Start(ent catdog_entry.Entry) (err error) {
 func Stop(ent catdog_entry.Entry) (err error) {
 	defer xerror.RespErr(&err)
 
-	xerror.Panic(dix.BeforeStop())
+	for _, fn := range catdog_abc.GetBeforeStop() {
+		fn()
+	}
 	xerror.Panic(ent.Stop())
-	xerror.Panic(dix.AfterStop())
+	for _, fn := range catdog_abc.GetAfterStop() {
+		fn()
+	}
 
 	return nil
 }
