@@ -171,7 +171,7 @@ func newEntry(name string, srv server.Server) *BaseEntry {
 		s: &entryServerWrapper{Server: srv},
 		opts: catdog_entry.Options{
 			RestCfg:    fiber.New().Config(),
-			Name:       Name,
+			Name:       name,
 			RestAddr:   ":8080",
 			RunCommand: runCmd,
 			Command:    rootCmd,

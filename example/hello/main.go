@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/pubgo/catdog"
 	"github.com/pubgo/catdog/example/hello/entry2"
+	"github.com/pubgo/catdog/example/hello/entry3"
 	"github.com/pubgo/xerror"
 
 	"github.com/pubgo/catdog/example/hello/entry"
@@ -15,5 +16,6 @@ func main() {
 		entry.GetEntry(),
 		entry1.GetEntry(),
 		entry2.GetEntry(),
+		entry3.GetEntry(),
 	))
 }

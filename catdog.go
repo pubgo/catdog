@@ -4,8 +4,10 @@ import (
 	"github.com/pubgo/catdog/catdog_app"
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
+	"github.com/pubgo/catdog/catdog_entry/ctl_entry"
 	"github.com/pubgo/catdog/catdog_entry/rest_entry"
 	"github.com/pubgo/catdog/catdog_entry/rpc_entry"
+	"github.com/pubgo/catdog/catdog_entry/ws_entry"
 	"github.com/pubgo/xerror"
 )
 
@@ -31,4 +33,12 @@ func NewRpcEntry(name string) catdog_entry.Entry {
 
 func NewRestEntry(name string) catdog_entry.Entry {
 	return rest_entry.New(name)
+}
+
+func NewWsEntry(name string) catdog_entry.Entry {
+	return ws_entry.New(name)
+}
+
+func NewCtlEntry(name string) catdog_entry.Entry {
+	return ctl_entry.New(name)
 }
