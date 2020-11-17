@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"reflect"
+	"strings"
+
 	"github.com/asim/nitro/v3/metadata"
 	"github.com/asim/nitro/v3/server"
 	"github.com/fasthttp/websocket"
@@ -12,9 +16,6 @@ import (
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
 	"github.com/valyala/fasthttp"
-	"net/http"
-	"reflect"
-	"strings"
 )
 
 type fastHttpRequest struct{}
@@ -51,66 +52,46 @@ func (t *entryServerWrapper) Stop() (err error) {
 func (t *entryServerWrapper) wsHandle(ctx context.Context, _ server.Request, rsp interface{}) (err error) {
 	defer xerror.RespErr(&err)
 
-	var upgrade = websocket.FastHTTPUpgrader{
-		HandshakeTimeout:  0,
-		Subprotocols:      nil,
-		ReadBufferSize:    1024,
-		WriteBufferSize:   1024,
-		EnableCompression: true,
-		CheckOrigin: func(ctx *fasthttp.RequestCtx) bool {
-			return true
-		},
-	}
+	//defer conn.Close()
+	//conn.SetReadLimit(maxMessageSize)
+	//conn.SetReadDeadline(time.Now().Add(pongWait))
+	//conn.SetWriteDeadline(time.Now().Add(writeWait))
+	//conn.SetPongHandler(func(string) error { conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 
 	mth := ctx.Value(mth{}).(reflect.Value)
 	mthInType := mth.Type().In(1)
 	mthOutType := mth.Type().In(2)
-	view := rsp.(*fiber.Ctx)
-	err = upgrade.Upgrade(view.Context(), func(conn *websocket.Conn) {
-		//defer conn.Close()
-		//conn.SetReadLimit(maxMessageSize)
-		//conn.SetReadDeadline(time.Now().Add(pongWait))
-		//conn.SetWriteDeadline(time.Now().Add(writeWait))
-		//conn.SetPongHandler(func(string) error { conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c := rsp.(*websocket.Conn)
+	cancel := xprocess.GoLoop(func(_ context.Context) (err error) {
+		defer xerror.RespErr(&err)
 
-		c := rsp.(*websocket.Conn)
-		cancel := xprocess.GoLoop(func(_ context.Context) (err error) {
-			defer xerror.RespErr(&err)
-			mt, msg, err := c.ReadMessage()
-			xerror.Panic(err)
+		mt, msg, err := c.ReadMessage()
+		xerror.Panic(err)
 
-			mthIn := reflect.New(mthInType.Elem())
-			ret := reflect.ValueOf(json.Unmarshal).Call([]reflect.Value{reflect.ValueOf(msg), mthIn})
-			if !ret[0].IsNil() {
-				return xerror.Wrap(ret[0].Interface().(error))
-			}
+		mthIn := reflect.New(mthInType.Elem())
+		ret := reflect.ValueOf(json.Unmarshal).Call([]reflect.Value{reflect.ValueOf(msg), mthIn})
+		if !ret[0].IsNil() {
+			return xerror.Wrap(ret[0].Interface().(error))
+		}
 
-			mthOut := reflect.New(mthOutType.Elem())
-			ret = mth.Call([]reflect.Value{reflect.ValueOf(ctx), mthIn, mthOut})
-			if !ret[0].IsNil() {
-				return xerror.Wrap(ret[0].Interface().(error))
-			}
+		mthOut := reflect.New(mthOutType.Elem())
+		ret = mth.Call([]reflect.Value{reflect.ValueOf(ctx), mthIn, mthOut})
+		if !ret[0].IsNil() {
+			return xerror.Wrap(ret[0].Interface().(error))
+		}
 
-			dt, _err := json.Marshal(mthOut.Interface())
-			if err != nil {
-				return xerror.Wrap(_err)
-			}
+		dt, _err := json.Marshal(mthOut.Interface())
+		if err != nil {
+			return xerror.Wrap(_err)
+		}
 
-			return xerror.Wrap(c.WriteMessage(mt, dt))
-		})
-
-		c.SetCloseHandler(func(code int, text string) error {
-			xlog.Debugf("%d, %s", code, text)
-			return xerror.Wrap(cancel())
-		})
+		return xerror.Wrap(c.WriteMessage(mt, dt))
 	})
 
-	if err != nil {
-		if err == websocket.ErrBadHandshake {
-			log.Errorf("%#v", err)
-		}
-		return
-	}
+	c.SetCloseHandler(func(code int, text string) error {
+		xlog.Debugf("%d, %s", code, text)
+		return xerror.Wrap(cancel())
+	})
 
 	return nil
 }
@@ -179,10 +160,26 @@ func (t *entryServerWrapper) Handle(handler server.Handler) (err error) {
 				handle = hd[i-1](handle)
 			}
 
+			var upgrade = websocket.FastHTTPUpgrader{
+				HandshakeTimeout:  0,
+				Subprotocols:      nil,
+				ReadBufferSize:    1024,
+				WriteBufferSize:   1024,
+				EnableCompression: true,
+				CheckOrigin:       func(ctx *fasthttp.RequestCtx) bool { return true },
+			}
+
 			ctx := context.WithValue(view.Context(), fastHttpRequest{}, view)
 			ctx = context.WithValue(ctx, mth{}, hdlr.MethodByName(mthName))
-			xerror.Panic(handle(ctx, request, ctx))
-			return nil
+
+			if err != nil {
+				if err == websocket.ErrBadHandshake {
+					log.Errorf("%#v", err)
+				}
+				return
+			}
+
+			return xerror.Wrap(upgrade.Upgrade(view.Context(), func(conn *websocket.Conn) { xerror.Panic(handle(ctx, request, conn)) }))
 		}))
 	}
 
