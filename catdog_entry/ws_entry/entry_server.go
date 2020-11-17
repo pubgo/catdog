@@ -12,6 +12,7 @@ import (
 	"github.com/asim/nitro/v3/server"
 	"github.com/fasthttp/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pubgo/catdog/catdog_entry/entry"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
@@ -38,7 +39,7 @@ var httpMethods = map[string]struct{}{
 
 type entryServerWrapper struct {
 	server.Server
-	router fiber.Router
+	base *entry.BaseEntry
 }
 
 func (t *entryServerWrapper) Start() (err error) {
@@ -108,9 +109,12 @@ func (t *entryServerWrapper) wsHandler(httpMethod, path string, handlers fiber.H
 		path = "/" + path
 	}
 
-	t.router.Add(httpMethod, path, func(ctx *fiber.Ctx) error {
-		return xerror.Wrap(handlers(ctx))
+	t.base.Router(func(r fiber.Router) {
+		r.Add(httpMethod, path, func(ctx *fiber.Ctx) error {
+			return xerror.Wrap(handlers(ctx))
+		})
 	})
+
 	return nil
 }
 

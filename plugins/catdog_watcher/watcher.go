@@ -60,28 +60,23 @@ func Watch(name string, watcher func(r reader.Value) error) error {
 
 		// 开启监听配置
 		cancel := xprocess.Go(func(ctx context.Context) (err error) {
-			defer xerror.RespErr(&err)
-			defer func() {
-				xlog.Debugf("Stop Watch Config, Key: %s", key)
-				xerror.Panic(w.Stop())
-			}()
-
 			for {
+				r, err := w.Next()
+				if err != nil && strings.Contains(err.Error(), "stopped") {
+					break
+				}
+				xerror.Panic(err)
+				xerror.Panic(watcher(r))
+
 				select {
 				case <-ctx.Done():
 					return nil
-				default:
-					r, err := w.Next()
-					if err != nil && strings.Contains(err.Error(), "stopped") {
-						return nil
-					}
-					xerror.Panic(err)
-					xerror.Panic(watcher(r))
 				}
 			}
+			xlog.Debugf("Stop Watch Config, Key: %s", key)
+			return nil
 		})
 
-		// 关闭监听配置变化
-		xerror.Exit(dix_run.WithAfterStart(func(ctx *dix_run.AfterStartCtx) { xerror.Exit(cancel()) }))
+		xerror.Panic(dix_run.WithBeforeStop(func(ctx *dix_run.BeforeStopCtx) { xerror.Panic(w.Stop()); xerror.Panic(cancel()) }))
 	}))
 }

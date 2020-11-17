@@ -10,9 +10,11 @@ import (
 )
 
 func trace(cfg xlog_config.Config) {
-	if catdog_config.Trace {
+	if !catdog_config.Trace {
 		return
 	}
+
+	cfg.InitialFields = map[string]interface{}{"ss": 1}
 
 	xlog.Debug("log trace")
 	fmt.Println(catdog_util.MarshalIndent(cfg))

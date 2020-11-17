@@ -22,7 +22,7 @@ require (
 	github.com/imdario/mergo v0.3.9
 	github.com/jaegertracing/jaeger v1.19.2
 	github.com/opentracing/opentracing-go v1.1.0
-	github.com/pubgo/dix v0.1.2
+	github.com/pubgo/dix v0.1.3
 	github.com/pubgo/xerror v0.2.12
 	github.com/pubgo/xlog v0.0.10
 	github.com/pubgo/xprocess v0.0.3

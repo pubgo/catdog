@@ -13,10 +13,11 @@ type wsEntry struct {
 }
 
 func newEntry(name string) *wsEntry {
-	ent := &wsEntry{
-		BaseEntry: entry.New(name, &entryServerWrapper{Server: server_http.NewServer()}),
-	}
+	s := &entryServerWrapper{Server: server_http.NewServer()}
+	base := entry.New(name, s)
+	s.base = base
 
+	ent := &wsEntry{BaseEntry: base}
 	return ent
 }
 

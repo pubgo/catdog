@@ -82,6 +82,14 @@ func (t *BaseEntry) Options() catdog_entry.Options {
 	return t.opts
 }
 
+func (t *BaseEntry) initCfg() {
+	r, err := catdog_config.Load("http_server")
+	xerror.Panic(err)
+	if r != nil {
+		xerror.Panic(r.Scan(&t.opts.RestCfg))
+	}
+}
+
 func (t *BaseEntry) initFlags() {
 	xerror.Panic(t.Flags(func(flags *pflag.FlagSet) {
 		flags.StringVar(&t.opts.RestAddr, "http_addr", t.opts.RestAddr, "the http server address")
@@ -170,6 +178,7 @@ func newEntry(name string, srv server.Server) *BaseEntry {
 		},
 	}
 	ent.initFlags()
+	ent.initCfg()
 	ent.trace()
 
 	return ent
