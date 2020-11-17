@@ -9,7 +9,7 @@ import (
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_plugin"
-	"github.com/pubgo/catdog/version"
+	"github.com/pubgo/catdog/catdog_version"
 	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/spf13/cobra"
@@ -69,7 +69,7 @@ func Run(entries ...catdog_entry.Entry) (err error) {
 		}
 	}
 
-	var rootCmd = &cobra.Command{Use: catdog_config.Domain, Version: version.Version}
+	var rootCmd = &cobra.Command{Use: catdog_config.Domain, Version: catdog_version.Version}
 	rootCmd.PersistentFlags().AddFlagSet(catdog_config.DefaultFlags())
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return xerror.Wrap(cmd.Help()) }
 
