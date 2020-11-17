@@ -3,12 +3,12 @@ package catdog_config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pubgo/dix/dix_run"
 	"os"
 	"strings"
 
 	"github.com/pubgo/catdog/catdog_util"
 	"github.com/pubgo/dix"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"

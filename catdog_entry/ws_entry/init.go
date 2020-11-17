@@ -6,7 +6,7 @@ import (
 	"github.com/pubgo/xlog"
 )
 
-const Name = "rest_entry"
+const Name = "ws_entry"
 
 var log xlog.XLog
 

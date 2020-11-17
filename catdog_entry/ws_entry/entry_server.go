@@ -18,6 +18,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+const defaultContentType = "application/json"
+
 type fastHttpRequest struct{}
 
 type mth struct{}
@@ -112,8 +114,6 @@ func (t *entryServerWrapper) wsHandler(httpMethod, path string, handlers fiber.H
 	return nil
 }
 
-const defaultContentType = "application/json"
-
 func (t *entryServerWrapper) Handle(handler server.Handler) (err error) {
 	if handler == nil {
 		return xerror.New("[handler] should not be nil")
@@ -169,7 +169,8 @@ func (t *entryServerWrapper) Handle(handler server.Handler) (err error) {
 				CheckOrigin:       func(ctx *fasthttp.RequestCtx) bool { return true },
 			}
 
-			ctx := context.WithValue(view.Context(), fastHttpRequest{}, view)
+			ctx := metadata.NewContext(view.Context(), headers)
+			ctx = context.WithValue(ctx, fastHttpRequest{}, view)
 			ctx = context.WithValue(ctx, mth{}, hdlr.MethodByName(mthName))
 
 			if err != nil {

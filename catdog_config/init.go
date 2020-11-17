@@ -1,7 +1,6 @@
 package catdog_config
 
 import (
-	"github.com/pubgo/dix/dix_run"
 	"path/filepath"
 	"strings"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/asim/nitro/v3/config/source"
 	mEnv "github.com/asim/nitro/v3/config/source/env"
 	mFile "github.com/pubgo/catdog/internal/plugins/config/source/file"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 

@@ -1,4 +1,4 @@
-package base_entry
+package entry
 
 import (
 	"context"
@@ -121,7 +121,8 @@ func (t *entryServerWrapper) Handle(handler server.Handler) (err error) {
 				header:      headers,
 			}
 
-			ctx := context.WithValue(view.Context(), fastHttpRequest{}, view)
+			ctx := metadata.NewContext(view.Context(), headers)
+			ctx = context.WithValue(ctx, fastHttpRequest{}, view)
 			ctx = context.WithValue(ctx, mth{}, mthHandle)
 			return xerror.Wrap(handle(ctx, request, view))
 		}))

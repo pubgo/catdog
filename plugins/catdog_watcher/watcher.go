@@ -2,13 +2,13 @@ package catdog_watcher
 
 import (
 	"context"
-	"github.com/pubgo/dix/dix_run"
 	"strings"
 
 	"github.com/asim/nitro-plugins/config/source/etcd/v3"
 	"github.com/asim/nitro/v3/config"
 	"github.com/asim/nitro/v3/config/reader"
 	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"

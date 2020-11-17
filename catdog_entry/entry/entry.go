@@ -1,9 +1,8 @@
-package base_entry
+package entry
 
 import (
 	"context"
 	"fmt"
-	"github.com/pubgo/dix/dix_run"
 	"net/http"
 	"strings"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/catdog/plugins/catdog_server"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"

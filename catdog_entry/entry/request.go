@@ -1,4 +1,4 @@
-package base_entry
+package entry
 
 import (
 	"github.com/asim/nitro/v3/codec"

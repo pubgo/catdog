@@ -1,4 +1,4 @@
-package base_entry
+package entry
 
 import (
 	"context"
