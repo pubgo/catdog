@@ -15,7 +15,7 @@ func init() {
 		}
 
 		xlog.Debug("server trace")
-		fmt.Printf("%#v\n", Default.Server)
+		fmt.Printf("%#v\n", Default.Server.Options())
 		fmt.Println()
 	}))
 }

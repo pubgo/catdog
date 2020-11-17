@@ -21,7 +21,7 @@ type Entry interface {
 
 type Option func(o *Options)
 type Options struct {
-	App         *fiber.App
+	RestCfg     fiber.Config
 	Initialized bool
 	RestAddr    string
 	Name        string

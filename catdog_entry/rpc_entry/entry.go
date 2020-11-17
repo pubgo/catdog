@@ -9,14 +9,14 @@ import (
 )
 
 type rpcEntry struct {
-	catdog_entry.Entry
+	*entry.BaseEntry
 	c client.Client
 }
 
 func newEntry(name string) *rpcEntry {
 	ent := &rpcEntry{
-		Entry: entry.New(name, grpc.NewServer()),
-		c:     grpcC.NewClient(),
+		BaseEntry: entry.New(name, grpc.NewServer()),
+		c:         grpcC.NewClient(),
 	}
 
 	return ent

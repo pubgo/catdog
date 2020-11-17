@@ -8,6 +8,31 @@ services:
     version: "v0.0.1"
   user:
     version: "v0.0.2"
+http_server:
+  enabled: true
+  prefork: false
+  server_header: ''
+  strict_routing: false
+  case_sensitive: false
+  immutable: false
+  unescape_path: false
+  etag: false
+  body_limit: 4194304
+  concurrency: 262144
+  read_timeout: 0
+  write_timeout: 0
+  idle_timeout: 0
+  read_buffer_size: 4096
+  write_buffer_size: 4096
+  compressed_file_suffix: .fiber.gz
+  proxy_header: ''
+  get_only: false
+  disable_keepalive: false
+  disable_default_date: false
+  disable_default_content_type: false
+  disable_header_normalizing: false
+  disable_startup_message: false
+  reduce_memory_usage: false
 config:
   watcher:
     address:

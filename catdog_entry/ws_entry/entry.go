@@ -8,13 +8,13 @@ import (
 )
 
 type wsEntry struct {
-	catdog_entry.Entry
+	*entry.BaseEntry
 	c client.Client
 }
 
 func newEntry(name string) *wsEntry {
 	ent := &wsEntry{
-		Entry: entry.New(name, &entryServerWrapper{Server: server_http.NewServer()}),
+		BaseEntry: entry.New(name, &entryServerWrapper{Server: server_http.NewServer()}),
 	}
 
 	return ent

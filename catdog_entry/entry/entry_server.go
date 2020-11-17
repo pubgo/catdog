@@ -19,7 +19,7 @@ const defaultContentType = "application/json"
 
 type entryServerWrapper struct {
 	server.Server
-	router fiber.Router
+	routers []func(r fiber.Router)
 }
 
 var httpMethods = map[string]struct{}{
@@ -44,7 +44,10 @@ func (t *entryServerWrapper) httpHandler(httpMethod, path string, handlers ...fi
 		path = "/" + path
 	}
 
-	t.router.Add(strings.ToUpper(httpMethod), path, handlers...)
+	t.routers = append(t.routers, func(r fiber.Router) {
+		r.Add(strings.ToUpper(httpMethod), path, handlers...)
+	})
+
 	return nil
 }
 

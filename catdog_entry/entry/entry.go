@@ -15,48 +15,41 @@ import (
 	"github.com/pubgo/catdog/plugins/catdog_server"
 	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
-	"github.com/pubgo/xlog"
 	"github.com/pubgo/xprocess"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
-var _ catdog_entry.Entry = (*entry)(nil)
+var _ catdog_entry.Entry = (*BaseEntry)(nil)
 
-type entry struct {
+type BaseEntry struct {
+	app  *fiber.App
 	s    *entryServerWrapper
 	opts catdog_entry.Options
 }
 
-func (t *entry) Init() (err error) {
+func (t *BaseEntry) Router(fn func(r fiber.Router)) {
+	t.s.routers = append(t.s.routers, fn)
+}
+
+func (t *BaseEntry) Init() (err error) {
 	defer xerror.RespErr(&err)
-
-	xerror.Panic(dix_run.WithAfterStart(func(ctx *dix_run.AfterStartCtx) {
-		if !catdog_config.Trace || !t.opts.Initialized {
-			return
-		}
-
-		xlog.Debug("entry rest trace")
-		for _, stacks := range t.opts.App.Stack() {
-			for _, stack := range stacks {
-				if stack.Path == "/" {
-					continue
-				}
-
-				log.Debugf("%s %s", stack.Method, stack.Path)
-			}
-		}
-		fmt.Println()
-	}))
 
 	t.opts.Initialized = true
 	catdog_config.Project = t.Options().Name
 	catdog_server.Default.Server = t.s.Server
 
+	// 初始化routes
+	t.app = fiber.New(t.opts.RestCfg)
+	r := t.app.Group(t.opts.Name)
+	for i := range t.s.routers {
+		t.s.routers[i](r)
+	}
+
 	return nil
 }
 
-func (t *entry) Start() (err error) {
+func (t *BaseEntry) Start() (err error) {
 	defer xerror.RespErr(&err)
 
 	cancel := xprocess.Go(func(ctx context.Context) (err error) {
@@ -64,7 +57,7 @@ func (t *entry) Start() (err error) {
 
 		addr := t.Options().RestAddr
 		log.Infof("Server [http] Listening on http://%s", addr)
-		xerror.Panic(t.opts.App.Listen(addr))
+		xerror.Panic(t.app.Listen(addr))
 		log.Infof("Server [http] Closed OK")
 
 		return nil
@@ -72,7 +65,7 @@ func (t *entry) Start() (err error) {
 
 	xerror.Panic(dix_run.WithBeforeStop(func(ctx *dix_run.BeforeStopCtx) {
 		xerror.Panic(cancel())
-		if err := t.opts.App.Shutdown(); err != nil && err != http.ErrServerClosed {
+		if err := t.app.Shutdown(); err != nil && err != http.ErrServerClosed {
 			fmt.Println(xerror.Parse(err).Println())
 		}
 	}))
@@ -80,22 +73,29 @@ func (t *entry) Start() (err error) {
 	return xerror.Wrap(t.s.Start())
 }
 
-func (t *entry) Stop() (err error) {
+func (t *BaseEntry) Stop() (err error) {
 	defer xerror.RespErr(&err)
 	return xerror.Wrap(t.s.Stop())
 }
 
-func (t *entry) Options() catdog_entry.Options {
+func (t *BaseEntry) Options() catdog_entry.Options {
 	return t.opts
 }
 
-func (t *entry) Flags(fn func(flags *pflag.FlagSet)) (err error) {
+func (t *BaseEntry) initFlags() {
+	xerror.Panic(t.Flags(func(flags *pflag.FlagSet) {
+		flags.StringVar(&t.opts.RestAddr, "http_addr", t.opts.RestAddr, "the http server address")
+		flags.BoolVar(&t.opts.RestCfg.DisableStartupMessage, "disable_startup_message", t.opts.RestCfg.DisableStartupMessage, "print out the http server art and listening address")
+	}))
+}
+
+func (t *BaseEntry) Flags(fn func(flags *pflag.FlagSet)) (err error) {
 	defer xerror.RespErr(&err)
 	fn(t.opts.Command.PersistentFlags())
 	return nil
 }
 
-func (t *entry) Description(description ...string) error {
+func (t *BaseEntry) Description(description ...string) error {
 	t.opts.Command.Short = fmt.Sprintf("This is a %s service", t.opts.Name)
 
 	if len(description) > 0 {
@@ -111,7 +111,7 @@ func (t *entry) Description(description ...string) error {
 	return nil
 }
 
-func (t *entry) Version(v string) error {
+func (t *BaseEntry) Version(v string) error {
 	t.opts.Version = strings.TrimSpace(v)
 	if t.opts.Version == "" {
 		return xerror.New("[version] should not be null")
@@ -122,7 +122,7 @@ func (t *entry) Version(v string) error {
 	return xerror.WrapF(err, "[v] version format error")
 }
 
-func (t *entry) Commands(commands ...*cobra.Command) error {
+func (t *BaseEntry) Commands(commands ...*cobra.Command) error {
 	rootCmd := t.opts.Command
 	for _, cmd := range commands {
 		if cmd == nil {
@@ -139,11 +139,11 @@ func (t *entry) Commands(commands ...*cobra.Command) error {
 }
 
 // func(s server.Server, handle TestHandler, opts ...server.HandlerOption) error
-func (t *entry) Handler(hdlr interface{}, opts ...server.HandlerOption) error {
+func (t *BaseEntry) Handler(hdlr interface{}, opts ...server.HandlerOption) error {
 	return xerror.Wrap(catdog_handler.Register(t.s, hdlr, opts...))
 }
 
-func newEntry(name string, srv server.Server) *entry {
+func newEntry(name string, srv server.Server) *BaseEntry {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		xerror.Panic(xerror.New("the [name] parameter should not be empty"))
@@ -159,26 +159,23 @@ func newEntry(name string, srv server.Server) *entry {
 	runCmd := &cobra.Command{Use: "run", Short: "run as a service"}
 	rootCmd.AddCommand(runCmd)
 
-	app := fiber.New()
-	ent := &entry{
-		s: &entryServerWrapper{Server: srv, router: app.Group(name)},
+	ent := &BaseEntry{
+		s: &entryServerWrapper{Server: srv},
 		opts: catdog_entry.Options{
-			App:        app,
+			RestCfg:    fiber.New().Config(),
 			Name:       Name,
 			RestAddr:   ":8080",
 			RunCommand: runCmd,
 			Command:    rootCmd,
 		},
 	}
-
-	xerror.Panic(ent.Flags(func(flags *pflag.FlagSet) {
-		flags.StringVar(&ent.opts.RestAddr, "rest_addr", ent.opts.RestAddr, "the http server address")
-	}))
+	ent.initFlags()
+	ent.trace()
 
 	return ent
 }
 
-func New(name string, srv server.Server) catdog_entry.Entry {
+func New(name string, srv server.Server) *BaseEntry {
 	return newEntry(name, srv)
 }
 
