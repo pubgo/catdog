@@ -1,13 +1,13 @@
 app:
+  enabled: true
   name: "catdog"
   version: "v0.0.1"
   home: ""
   debug: "true"
-services:
-  debug:
-    version: "v0.0.1"
-  user:
-    version: "v0.0.2"
+catdog_debug:
+  enabled: true
+recovery:
+  enabled: true
 http_server:
   enabled: true
   prefork: false
@@ -33,15 +33,17 @@ http_server:
   disable_header_normalizing: false
   disable_startup_message: false
   reduce_memory_usage: false
-config:
-  watcher:
-    address:
-      - "127.0.0.1:2379"
+watcher:
+  enabled: true
+  address:
+    - "127.0.0.1:2379"
 etcd:
+  enabled: true
   default:
     - "127.0.0.1:2379"
     - "127.0.0.1:2389"
 redis:
+  enabled: true
   codis:
     addr: "127.0.0.1:6379"
     password: "foobared"
@@ -59,6 +61,7 @@ redis:
     password: "foobared"
     db: 0
 mongodb:
+  enabled: true
   default:
     url: "mongodb://localhost:8080"
 log:

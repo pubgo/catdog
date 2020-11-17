@@ -19,15 +19,4 @@ func init() {
 		fmt.Printf("%#v\n", catdog_config.GetCfg().Config)
 		fmt.Println()
 	}))
-
-	xerror.Panic(dix_run.WithBeforeStart(func(ctx *dix_run.BeforeStartCtx) {
-		if !catdog_config.Trace {
-			return
-		}
-
-		xlog.Debugf("watcher trace test11111\n\n")
-		fmt.Printf("%#v\n", catdog_config.GetCfg().Config)
-		fmt.Println()
-	}))
-
 }

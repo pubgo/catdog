@@ -39,18 +39,19 @@ func (t *BaseEntry) Init() (err error) {
 	catdog_config.Project = t.Options().Name
 	catdog_server.Default.Server = t.s.Server
 
-	// 初始化routes
+	// 初始化app
 	t.app = fiber.New(t.opts.RestCfg)
-	r := t.app.Group(t.opts.Name)
-	for i := range t.s.routers {
-		t.s.routers[i](r)
-	}
-
 	return nil
 }
 
 func (t *BaseEntry) Start() (err error) {
 	defer xerror.RespErr(&err)
+
+	// 初始化routes
+	r := t.app.Group(t.opts.Name)
+	for i := range t.s.routers {
+		t.s.routers[i](r)
+	}
 
 	cancel := xprocess.Go(func(ctx context.Context) (err error) {
 		defer xerror.RespErr(&err)

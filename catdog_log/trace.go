@@ -14,8 +14,6 @@ func trace(cfg xlog_config.Config) {
 		return
 	}
 
-	cfg.InitialFields = map[string]interface{}{"ss": 1}
-
 	xlog.Debug("log trace")
 	fmt.Println(catdog_util.MarshalIndent(cfg))
 	fmt.Println()

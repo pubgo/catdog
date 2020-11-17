@@ -45,7 +45,7 @@ func Register(s server.Server, hdlr interface{}, opts ...server.HandlerOption) (
 	}
 
 	if !vRegister.IsValid() || vRegister.IsNil() {
-		return xerror.Fmt("[%s] 没有找到匹配的interface", hd.Name())
+		return xerror.Fmt("[%#v] 没有找到匹配的interface", hdlr)
 	}
 
 	vHandler := reflect.ValueOf(hdlr)

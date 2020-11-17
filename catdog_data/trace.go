@@ -2,9 +2,9 @@ package catdog_data
 
 import (
 	"fmt"
-	"github.com/pubgo/dix/dix_run"
 
 	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
 )

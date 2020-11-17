@@ -1,14 +1,14 @@
 package catdog_pidfile
 
 import (
-	"github.com/pubgo/catdog/catdog_util"
-	"github.com/pubgo/dix/dix_run"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 
 	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/catdog/catdog_util"
+	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"
 )
 
