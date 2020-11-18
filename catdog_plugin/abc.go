@@ -2,7 +2,7 @@ package catdog_plugin
 
 import (
 	"github.com/asim/nitro/v3/config/reader"
-	"github.com/pubgo/catdog/catdog_handler"
+	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -23,10 +23,9 @@ type ManagerOptions struct {
 // the micro API, Web, Sidecar, CLI. It's a method of building middleware for the HTTP side.
 type Plugin interface {
 	Watch(r reader.Value) error
-	Init(r reader.Value) error
+	Init(ent catdog_entry.Entry) error
 	Flags() *pflag.FlagSet
 	Commands() *cobra.Command
-	Handler() *catdog_handler.Handler
 	String() string
 }
 

@@ -24,14 +24,8 @@ func Start(ent catdog_entry.Entry) (err error) {
 	plugins := catdog_plugin.List(catdog_plugin.Module(ent.Options().Name))
 	for _, pg := range append(catdog_plugin.List(), plugins...) {
 		key := pg.String()
-		r, err := catdog_config.Load(key)
 		xerror.PanicF(err, "plugin [%s] load error", key)
-		xerror.PanicF(pg.Init(r), "plugin [%s] init error", key)
-
-		hdlr := pg.Handler()
-		if hdlr != nil {
-			xerror.Panic(ent.Handler(hdlr.Handler, hdlr.Opts...))
-		}
+		xerror.PanicF(pg.Init(ent), "plugin [%s] init error", key)
 	}
 
 	xerror.Panic(dix_run.BeforeStart())

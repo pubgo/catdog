@@ -2,6 +2,8 @@ package catdog_plugin
 
 import (
 	"github.com/asim/nitro/v3/config/reader"
+	"github.com/pubgo/catdog/catdog_config"
+	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/catdog/catdog_handler"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -14,15 +16,17 @@ var _ Plugin = (*Base)(nil)
 type Base struct {
 	Name       string
 	Enabled    bool `yaml:"enabled"`
-	OnInit     func(r reader.Value)
+	OnInit     func(ent catdog_entry.Entry)
 	OnWatch    func(r reader.Value)
 	OnCommands func(cmd *cobra.Command)
 	OnHandler  func() *catdog_handler.Handler
 	OnFlags    func(flags *pflag.FlagSet)
 }
 
-func (p *Base) Init(r reader.Value) (err error) {
+func (p *Base) Init(ent catdog_entry.Entry) (err error) {
 	defer xerror.RespErr(&err)
+	r, err := catdog_config.Load(p.Name)
+	xerror.Panic(err)
 	xerror.Panic(r.Scan(p))
 
 	var status = "disabled"
@@ -38,7 +42,7 @@ func (p *Base) Init(r reader.Value) (err error) {
 
 	if p.OnInit != nil {
 		xlog.Debugf("[%s] start init", p.Name)
-		p.OnInit(r)
+		p.OnInit(ent)
 	}
 	return nil
 }

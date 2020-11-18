@@ -2,6 +2,7 @@ package catdog_pidfile
 
 import (
 	"fmt"
+
 	"github.com/pubgo/catdog/catdog_config"
 	"github.com/pubgo/dix/dix_run"
 	"github.com/pubgo/xerror"

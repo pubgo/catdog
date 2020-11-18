@@ -2,10 +2,10 @@ package catdog_server
 
 import (
 	"crypto/tls"
+	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/dix/dix_run"
 
 	grpcS "github.com/asim/nitro-plugins/server/grpc/v3"
-	"github.com/asim/nitro/v3/config/reader"
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/catdog/catdog_plugin"
 	"github.com/pubgo/xerror"
@@ -21,7 +21,7 @@ func init() {
 			flags.StringVar(&opts.Address, "server_addr", opts.Address, "server address")
 			flags.StringVar(&opts.Name, "server_name", opts.Name, "server name")
 		},
-		OnInit: func(r reader.Value) {
+		OnInit: func(ent catdog_entry.Entry) {
 			xerror.Exit(dix_run.WithBeforeStart(func(ctx *dix_run.BeforeStartCtx) {
 				xerror.Exit(Default.Server.Init(server.Name(opts.Name)))
 				xerror.Exit(Default.Server.Init(server.Address(opts.Address)))

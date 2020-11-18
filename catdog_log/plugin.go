@@ -2,6 +2,7 @@ package catdog_log
 
 import (
 	"github.com/asim/nitro/v3/config/reader"
+	"github.com/pubgo/catdog/catdog_entry"
 	"github.com/pubgo/dix"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -32,7 +33,9 @@ func init() {
 		OnFlags: func(flags *pflag.FlagSet) {
 			flags.StringVar(&config.Level, "level", config.Level, "log level")
 		},
-		OnInit: func(r reader.Value) {
+		OnInit: func(ent catdog_entry.Entry) {
+			r, err := catdog_config.Load("log")
+			xerror.Panic(err)
 			xerror.Panic(r.Scan(&config))
 			xerror.Panic(initLog(config))
 		},

@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/pubgo/catdog/catdog_entry"
 	"time"
 
 	"github.com/asim/nitro/v3/client"
-	"github.com/asim/nitro/v3/config/reader"
 	"github.com/asim/nitro/v3/server"
 	"github.com/pubgo/xerror"
 	"github.com/pubgo/xlog"
@@ -21,7 +21,7 @@ import (
 func init() {
 	xerror.Exit(catdog_plugin.Register(&catdog_plugin.Base{
 		Name: "recovery",
-		OnInit: func(r reader.Value) {
+		OnInit: func(ent catdog_entry.Entry) {
 			xerror.Exit(catdog_server.WrapHandler(func(handlerFunc server.HandlerFunc) server.HandlerFunc {
 				return func(ctx context.Context, req server.Request, rsp interface{}) (err error) {
 					t := time.Now()
